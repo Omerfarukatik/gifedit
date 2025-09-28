@@ -1,6 +1,8 @@
 // lib/main.dart
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:memecreat/firebase_options.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/provider/localization_provider.dart';
 import 'package:memecreat/provider/creation_provider.dart';
@@ -22,8 +24,11 @@ import 'package:memecreat/screens/onboarding/splash_screen.dart';
 // -----------------------------------------------------------------
 // 1. ANA FONKSİYON VE GLOBAL PROVIDER YAPISI
 // -----------------------------------------------------------------
-void main() { 
+void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
   runApp(
     // MultiProvider, tüm sağlayıcıları uygulamanın en üst seviyesine taşır.

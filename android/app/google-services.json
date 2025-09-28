@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1041994959023",
+    "project_id": "gifedit-24349",
+    "storage_bucket": "gifedit-24349.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041994959023:android:de8ee0d2a068138d682c5a",
+        "android_client_info": {
+          "package_name": "com.example.memecreat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCWWslida68p09fAxoLVOIujSUEyS80iI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
