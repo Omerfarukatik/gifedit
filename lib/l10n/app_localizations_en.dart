@@ -229,4 +229,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessTemplates => 'Access to all templates';
+
+  @override
+  String get enterEmail => 'Please enter a valid email address.';
+
+  @override
+  String get enterUsername => 'Please enter a username.';
+
+  @override
+  String get passwordMinLength => 'Password must be at least 6 characters.';
+
+  @override
+  String get loginFailed => 'Login Failed.';
+
+  @override
+  String get signUpFailed => 'Sign up Failed.';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get pleaseSelectAGif => 'Please select a GIF template or upload your own.';
+
+  @override
+  String get gifSelected => 'GIF selected.';
+
+  @override
+  String get pleaseSelectAnImageFirst => 'Please select an image first';
+
+  @override
+  String get yourSelectedGif => 'Your Selected GIF';
+
+  @override
+  String get backToTemplates => 'Back to Templates';
+
+  @override
+  String get yourGif => 'Your GIF';
 }

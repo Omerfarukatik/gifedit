@@ -39,7 +39,14 @@ dependencies:
   intl: ^0.20.2
   flutter_localizations:
     sdk: flutter
-  firebase_core: ^4.1.1
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.1.1
+  cloud_firestore: ^5.0.2
+  firebase_storage: ^12.1.0
+  firebase_app_check: ^0.3.2+10
+  image_picker: ^1.1.2
+  file_picker: ^8.0.0+1
+  dio: ^5.9.0
 
 dev_dependencies:
   flutter_test:
@@ -67,9 +74,8 @@ flutter:
   generate: true 
   # To add assets to your application, add an assets section, like this:
   assets:
-  - resimler/
-  #   - images/a_dot_ham.jpeg
-  - assets/fonts/ 
+    - assets/
+    - assets/fonts/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

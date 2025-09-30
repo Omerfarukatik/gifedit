@@ -238,7 +238,7 @@
 // lib/screens/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
-import 'package:memecreat/provider/theme_provider.dart';
+import 'package:memecreat/providers/theme_provider.dart';
 import 'package:memecreat/screens/subscriptions_screen.dart';
 import 'package:provider/provider.dart';
 

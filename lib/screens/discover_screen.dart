@@ -247,10 +247,8 @@
 // lib/screens/discover_screen.dart
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
-import '../../theme/app_theme.dart'; 
-
-// Not: MemePostCard'ın bu dosyada veya ayrı bir widget dosyasında olması gerekir.
-// Temizlik için, MemePostCard'ın bu dosyanın içinde tanımlı olduğunu varsayıyorum.
+import 'package:memecreat/services/meme_post_card.dart';
+import 'package:memecreat/theme/app_theme.dart';
 
 class DiscoverScreen extends StatelessWidget {
   const DiscoverScreen({super.key});
@@ -341,7 +339,6 @@ class DiscoverScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               children: [
                 MemePostCard(
-                  context: context,
                   username: l10n.ahmet, // Örnek metinler için arb'a key ekleyebilirsiniz.
                   caption: l10n.memeCaption1,
                   likeCount: 123,
@@ -349,7 +346,6 @@ class DiscoverScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 MemePostCard(
-                  context: context,
                   username: l10n.ayse,
                   caption: l10n.memeCaption2,
                   likeCount: 456,
@@ -361,93 +357,6 @@ class DiscoverScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class MemePostCard extends StatelessWidget {
-  final BuildContext context;
-  final String username;
-  final String caption;
-  final int likeCount;
-  final String imagePath;
-
-  const MemePostCard({
-    super.key,
-    required this.context,
-    required this.username,
-    required this.caption,
-    required this.likeCount,
-    required this.imagePath,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryTextColor = theme.textTheme.bodyMedium!.color;
-    final secondaryTextColor = theme.hintColor;
-    final isDark = theme.brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 350, 
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: isDark ? AppColors.primary.withOpacity(0.2) : Colors.grey.shade200, 
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Center(
-              child: Text(
-                l10n.aiMemeImage, // YERELLEŞTİRİLDİ
-                style: TextStyle(color: secondaryTextColor),
-              ), 
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0),
-          child: Text(
-            caption,
-            style: TextStyle(color: primaryTextColor, fontSize: 16),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.favorite, size: 20, color: Colors.red[400]),
-                const SizedBox(width: 4),
-                Text('$likeCount', style: TextStyle(color: secondaryTextColor)),
-                const SizedBox(width: 16),
-                Icon(Icons.link, size: 20, color: secondaryTextColor),
-              ],
-            ),
-            Icon(Icons.bookmark_border, size: 20, color: secondaryTextColor),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            CircleAvatar(
-              radius: 12,
-              backgroundColor: theme.colorScheme.primary.withOpacity(0.5),
-              child: Icon(Icons.person, size: 15, color: theme.iconTheme.color),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              username,
-              style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

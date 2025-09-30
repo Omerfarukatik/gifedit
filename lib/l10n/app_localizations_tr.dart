@@ -229,4 +229,40 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get accessTemplates => 'Tüm şablonlara erişim';
+
+  @override
+  String get enterEmail => 'Lütfen geçerli bir e-posta adresi girin.';
+
+  @override
+  String get enterUsername => 'Lütfen bir kullanıcı adı girin.';
+
+  @override
+  String get passwordMinLength => 'Şifre en az 6 karakter olmalıdır.';
+
+  @override
+  String get loginFailed => 'Giriş Başarısız Oldu.';
+
+  @override
+  String get signUpFailed => 'Kayıt Başarısız Oldu.';
+
+  @override
+  String get alreadyHaveAccount => 'Zaten bir hesabınız var mı?';
+
+  @override
+  String get pleaseSelectAGif => 'Lütfen bir GIF şablonu veya kendi GIF\'ini seçin.';
+
+  @override
+  String get gifSelected => 'GIF seçildi.';
+
+  @override
+  String get pleaseSelectAnImageFirst => 'Lütfen önce bir fotoğraf seçin.';
+
+  @override
+  String get yourSelectedGif => 'Seçilen GIF';
+
+  @override
+  String get backToTemplates => 'Şablonlara Geri Dön';
+
+  @override
+  String get yourGif => 'Gifiniz';
 }

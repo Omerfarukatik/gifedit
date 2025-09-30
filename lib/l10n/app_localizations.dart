@@ -538,6 +538,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Access to all templates'**
   String get accessTemplates;
+
+  /// No description provided for @enterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get enterEmail;
+
+  /// No description provided for @enterUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a username.'**
+  String get enterUsername;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters.'**
+  String get passwordMinLength;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login Failed.'**
+  String get loginFailed;
+
+  /// No description provided for @signUpFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up Failed.'**
+  String get signUpFailed;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @pleaseSelectAGif.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a GIF template or upload your own.'**
+  String get pleaseSelectAGif;
+
+  /// No description provided for @gifSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'GIF selected.'**
+  String get gifSelected;
+
+  /// No description provided for @pleaseSelectAnImageFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an image first'**
+  String get pleaseSelectAnImageFirst;
+
+  /// No description provided for @yourSelectedGif.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Selected GIF'**
+  String get yourSelectedGif;
+
+  /// No description provided for @backToTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Templates'**
+  String get backToTemplates;
+
+  /// No description provided for @yourGif.
+  ///
+  /// In en, this message translates to:
+  /// **'Your GIF'**
+  String get yourGif;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

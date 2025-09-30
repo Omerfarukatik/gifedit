@@ -78,5 +78,19 @@
   "yearPeriod": "yıl",
   "unlimitedMeme": "Sınırsız meme üretimi",
   "noWatermarks": "Filigran yok",
-  "accessTemplates": "Tüm şablonlara erişim"
+  "accessTemplates": "Tüm şablonlara erişim",
+
+  "enterEmail": "Lütfen geçerli bir e-posta adresi girin.",
+  "enterUsername": "Lütfen bir kullanıcı adı girin.",
+  "passwordMinLength": "Şifre en az 6 karakter olmalıdır.",
+  "loginFailed": "Giriş Başarısız Oldu.",
+  "signUpFailed": "Kayıt Başarısız Oldu.",
+  "alreadyHaveAccount": "Zaten bir hesabınız var mı?",
+
+  "pleaseSelectAGif": "Lütfen bir GIF şablonu veya kendi GIF'ini seçin.",
+  "gifSelected": "GIF seçildi.",
+  "pleaseSelectAnImageFirst": "Lütfen önce bir fotoğraf seçin.",
+   "yourSelectedGif": "Seçilen GIF",
+   "backToTemplates": "Şablonlara Geri Dön",
+   "yourGif": "Gifiniz"
 }
