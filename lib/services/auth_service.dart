@@ -28,9 +28,11 @@ Future<User?> signIn({required String email, required String password}) async {
     );
     return userCredential.user;
   } on FirebaseAuthException catch (e) {
-    return Future.error(e.code); // Sadece error code dön
-  } catch (e) {
-    return Future.error('unknown-error');
+    throw e.code;
+  } on PlatformException {
+    throw 'invalid-credential';
+  } catch (_) {
+    throw 'unknown-error';
   }
 }
 

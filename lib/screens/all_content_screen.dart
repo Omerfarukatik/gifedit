@@ -49,8 +49,7 @@
 // lib/screens/all_content_screen.dart
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
-import 'discover_screen.dart'; // MemePostCard için
-
+import 'package:memecreat/services/meme_post_card.dart';
 class AllContentScreen extends StatelessWidget {
   final String contentType; 
 
@@ -76,7 +75,6 @@ class AllContentScreen extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(bottom: 25.0),
             child: MemePostCard(
-              context: context,
               username: isSaved ? 'fav_user_${index + 1}' : l10n.username,
               caption: isSaved 
                   ? 'Kaydettiğim harika bir meme! #${index + 1}'
