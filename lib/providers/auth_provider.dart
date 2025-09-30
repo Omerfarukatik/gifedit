@@ -40,22 +40,19 @@ Future<bool> signIn({required String email, required String password}) async {
   notifyListeners();
 
   try {
-    await _authService.signIn(email: email, password: password);
-    return true;
+    final user = await _authService.signIn(email: email, password: password);
+    // Giriş başarılıysa user nesnesi döner.
+    return user != null;
   } catch (e) {
-    // Firebase kodlarını UI için çevir
-    if (e == 'invalid-credential' || e == 'wrong-password' || e == 'user-not-found') {
-      _errorMessage = 'E-posta veya şifre hatalı.';
-    } else {
-      _errorMessage = 'Bir hata oluştu: $e';
-    }
+    // Hata yakalanırsa mesajı ayarla.
+    _errorMessage = _mapAuthErrorToMessage(e.toString());
     return false;
   } finally {
+    // İşlem bitince yüklenme durumunu kapat.
     _isLoading = false;
     notifyListeners();
   }
 }
-
 
   Future<bool> signUp({required String email, required String password, required String username}) async {
     _isLoading = true;

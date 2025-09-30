@@ -25,15 +25,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // Firebase App Check'i etkinleştir
-  await FirebaseAppCheck.instance.activate(
-    // Android için Play Integrity
-    androidProvider: AndroidProvider.playIntegrity,
-    // iOS için DeviceCheck
-    appleProvider: AppleProvider.deviceCheck,
-  );
-  
+await FirebaseAppCheck.instance.activate(
+  androidProvider: AndroidProvider.debug,
+  appleProvider: AppleProvider.debug,
+);  
   runApp(
     MultiProvider(
       providers: [
