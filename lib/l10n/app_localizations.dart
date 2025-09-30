@@ -538,6 +538,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Access to all templates'**
   String get accessTemplates;
+
+  /// No description provided for @enterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get enterEmail;
+
+  /// No description provided for @enterUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a username.'**
+  String get enterUsername;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters.'**
+  String get passwordMinLength;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login Failed.'**
+  String get loginFailed;
+
+  /// No description provided for @signUpFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up Failed.'**
+  String get signUpFailed;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

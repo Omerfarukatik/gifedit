@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Uygulama, yüzünüzü GIF'lere işlemek için fotoğraf galerisine erişmek istiyor.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Uygulama, yeni fotoğraf çekmek için kameranıza erişmek istiyor.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Uygulama video kaydı yapabilmek için mikrofonunuza erişmek istiyor.</string>
+
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

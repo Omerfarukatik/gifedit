@@ -79,5 +79,12 @@
   "yearPeriod": "year",
   "unlimitedMeme": "Unlimited meme generation",
   "noWatermarks": "No watermarks",
-  "accessTemplates": "Access to all templates"
+  "accessTemplates": "Access to all templates",
+  
+    "enterEmail": "Please enter a valid email address.",
+  "enterUsername": "Please enter a username.",
+  "passwordMinLength": "Password must be at least 6 characters.",
+  "loginFailed": "Login Failed.",
+  "signUpFailed": "Sign up Failed.",
+  "alreadyHaveAccount": "Already have an account?"
 }
