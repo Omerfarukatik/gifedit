@@ -12,7 +12,20 @@
           "package_name": "com.example.memecreat"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1041994959023-mgupnt9mcgq2kn7tlufl8h1saiaocq4e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.memecreat",
+            "certificate_hash": "d9a66ac39190caa49b13601b1e74e58f42880069"
+          }
+        },
+        {
+          "client_id": "1041994959023-c7epf4nsfene4pb721djqafulo7h3c18.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCCWWslida68p09fAxoLVOIujSUEyS80iI"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041994959023-c7epf4nsfene4pb721djqafulo7h3c18.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1041994959023-pjpn0ip3ucndkulg905n1nc9j2a2ogsd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.memecreat"
+              }
+            }
+          ]
         }
       }
     }

@@ -64,6 +64,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1041994959023',
     projectId: 'gifedit-24349',
     storageBucket: 'gifedit-24349.firebasestorage.app',
+    androidClientId: '1041994959023-mgupnt9mcgq2kn7tlufl8h1saiaocq4e.apps.googleusercontent.com',
+    iosClientId: '1041994959023-pjpn0ip3ucndkulg905n1nc9j2a2ogsd.apps.googleusercontent.com',
     iosBundleId: 'com.example.memecreat',
   );
 
@@ -73,6 +75,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1041994959023',
     projectId: 'gifedit-24349',
     storageBucket: 'gifedit-24349.firebasestorage.app',
+    androidClientId: '1041994959023-mgupnt9mcgq2kn7tlufl8h1saiaocq4e.apps.googleusercontent.com',
+    iosClientId: '1041994959023-pjpn0ip3ucndkulg905n1nc9j2a2ogsd.apps.googleusercontent.com',
     iosBundleId: 'com.example.memecreat',
   );
 
@@ -85,4 +89,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'gifedit-24349.firebasestorage.app',
     measurementId: 'G-5JJS0NCKZB',
   );
+
 }

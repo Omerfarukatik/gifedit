@@ -86,5 +86,13 @@
   "passwordMinLength": "Password must be at least 6 characters.",
   "loginFailed": "Login Failed.",
   "signUpFailed": "Sign up Failed.",
-  "alreadyHaveAccount": "Already have an account?"
+  "alreadyHaveAccount": "Already have an account?",
+
+  "pleaseSelectAGif": "Please select a GIF template or upload your own.",
+  "gifSelected": "GIF selected.",
+  "pleaseSelectAnImageFirst": "Please select an image first",
+  "yourSelectedGif": "Your Selected GIF",
+  "backToTemplates": "Back to Templates",
+  "yourGif": "Your GIF"
+
 }

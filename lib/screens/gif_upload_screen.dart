@@ -1,30 +1,70 @@
-// lib/screens/gif_upload_screen.dart (SADECE UI VE YERELLEŞTİRME)
+// lib/screens/gif_upload_screen.dart (TAM VE GÜNCEL HALİ)
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:memecreat/l10n/app_localizations.dart';
 
-import 'package:memecreat/l10n/app_localizations.dart'; 
-import 'package:memecreat/providers/creation_provider.dart';
-import 'package:provider/provider.dart';
-
+// Servislerimizi ve diğer ekranları import ediyoruz
+import '../../services/image_picker_service.dart';
+import 'gif_selection_screen.dart';
 import '../../theme/app_theme.dart';
-import 'gif_selection_screen.dart'; // Navigasyon hedefi
 
-class GifUploadScreen extends StatelessWidget {
+class GifUploadScreen extends StatefulWidget {
   const GifUploadScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final creationProvider = Provider.of<CreationProvider>(context);
-    final theme = Theme.of(context);
+  State<GifUploadScreen> createState() => _GifUploadScreenState();
+}
+
+class _GifUploadScreenState extends State<GifUploadScreen> {
+  File? _selectedImage;
+  final ImagePickerService _pickerService = ImagePickerService();
+
+  // Galeriden yüz fotoğrafı seçme fonksiyonu
+  Future<void> _pickImage() async {
+    // Servisimizdeki doğru fonksiyonu çağırıyoruz
+    final File? image = await _pickerService.pickImageFromGallery();
+    if (image != null) {
+      setState(() {
+        _selectedImage = image;
+      });
+    }
+  }
+
+  // Sonraki ekrana gitme ve kontrol fonksiyonu
+  void _navigateToNextScreen(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (_selectedImage != null) {
+      // Resim seçildiyse, bir sonraki ekrana git ve resmi parametre olarak gönder.
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GifSelectionScreen(userImage: _selectedImage!),
+        ),
+      );
+    } else {
+      // Resim seçilmediyse, kullanıcıyı uyar.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.pleaseSelectAnImageFirst),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final primaryTextColor = theme.textTheme.bodyMedium!.color;
     final secondaryTextColor = theme.hintColor;
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.uploadYourFace), // Başlık
+        title: Text(l10n.uploadYourFace),
         elevation: 0,
         centerTitle: true,
       ),
@@ -39,68 +79,46 @@ class GifUploadScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Görsel Yükleme Alanı (Placeholder)
-            AspectRatio(
-              aspectRatio: 1.0, // Kare bir alan
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.primary.withOpacity(0.1) : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColors.primary, width: 2),
-                ),
-                child: creationProvider.selectedImage == null
-                    ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.camera_alt, size: 50, color: secondaryTextColor),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.selectImageToProcess,
-                            style: TextStyle(color: secondaryTextColor),
-                          ),
-                        ],
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(13), // Kenarlıktan biraz daha küçük
-                        child: Image.file(
-                          creationProvider.selectedImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+            // Resim gösterme alanı
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.primary.withOpacity(0.1) : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: AppColors.primary, width: 2),
+                image: _selectedImage != null
+                    ? DecorationImage(
+                  image: FileImage(_selectedImage!),
+                  fit: BoxFit.cover,
+                )
+                    : null,
               ),
+              child: _selectedImage == null
+                  ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.camera_alt, size: 50, color: secondaryTextColor),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.selectImageToProcess,
+                    style: TextStyle(color: secondaryTextColor),
+                  ),
+                ],
+              )
+                  : null,
             ),
             const SizedBox(height: 24),
 
-            // Yükleme Butonu
+            // "Galeriden Seç" Butonu
             ElevatedButton(
-              onPressed: creationProvider.isLoading ? null : () {
-                creationProvider.pickUserImage();
-              },
-              child: creationProvider.isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(l10n.selectFromGallery),
+              onPressed: _pickImage, // Doğru fonksiyonu çağırıyor
+              child: Text(l10n.selectFromGallery),
             ),
             const SizedBox(height: 40),
 
-            // Devam Butonu
+            // "Devam Et" Butonu
             ElevatedButton(
-              onPressed: creationProvider.selectedImage == null ? null : () async {
-                // Önce görseli yükle
-                final imageUrl = await creationProvider.uploadUserImage();
-
-                // Yükleme başarılıysa sonraki ekrana git
-                if (imageUrl != null && context.mounted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const GifSelectionScreen()),
-                  );
-                } else if (context.mounted) {
-                  // Hata durumunda kullanıcıyı bilgilendir
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.signUpFailed)), // Yerelleştirilmiş hata mesajı
-                  );
-                }
-              },
+              onPressed: () => _navigateToNextScreen(context), // context ile çağırıyor
               child: Text(l10n.continueText),
             ),
           ],
