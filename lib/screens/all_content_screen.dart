@@ -1,59 +1,110 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
-import 'package:memecreat/providers/profile_provider.dart'; // GERÇEK VERİ İÇİN
+import 'package:memecreat/providers/profile_provider.dart';
 import 'package:memecreat/services/meme_post_card.dart';
 import 'package:provider/provider.dart';
 
 class AllContentScreen extends StatelessWidget {
   final String contentType;
-
   const AllContentScreen({super.key, required this.contentType});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final profileProviderForActions =
+    Provider.of<ProfileProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(contentType),
-        elevation: 0,
-        centerTitle: true,
       ),
-      // Provider'ı dinleyerek listeyi dinamik hale getiriyoruz
       body: Consumer<ProfileProvider>(
         builder: (context, profileProvider, child) {
-          // Hangi listeyi göstereceğimizi contentType'a göre belirliyoruz.
-          final List<Map<String, dynamic>> items;
-          if (contentType == l10n.savedMemes) {
-            items = profileProvider.savedGifs;
-          } else if (contentType == l10n.recentCreations) {
-            items = profileProvider.createdGifs;
-          } else {
-            items = []; // Beklenmedik bir durum için boş liste
-          }
+          // Başlangıç verisini ve ID'leri almak için provider'ı kullanıyoruz.
+          final List<Map<String, dynamic>> initialItems =
+          (contentType == l10n.savedMemes)
+              ? profileProvider.savedGifs
+              : profileProvider.createdGifs;
 
-          if (items.isEmpty) {
+          if (profileProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (initialItems.isEmpty) {
             return Center(child: Text(l10n.nothingHereYet));
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final gifData = items[index];
+          // Gösterilecek GIF'lerin ID listesini oluşturuyoruz.
+          final List<String> gifIds =
+          initialItems.map((item) => item['id'] as String).toList();
 
-              // Veritabanından gelen verileri MemePostCard'a aktar
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 25.0),
-                child: MemePostCard(
-                  username: gifData['creatorUsername'] ?? l10n.username,
-                  userAvatarUrl: gifData['creatorProfileUrl'],
-                  caption: "Harika bir GIF!", // TODO: Buraya da dinamik bir açıklama gelebilir
-                  likeCount: gifData['likes'] ?? 0,
-                  imageUrl: gifData['gifUrl'], // GERÇEK GIF URL'Sİ
-                  isAsset: false, // Network'ten yükleneceğini belirtiyoruz
-                  gifData: gifData
-                ),
+          // Bu ID'leri kullanarak `gifs` koleksiyonundan CANLI bir stream çekiyoruz.
+          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            // `whereIn` sorgusu ile sadece bu ekranda olması gereken GIF'leri çekiyoruz.
+            stream: FirebaseFirestore.instance
+                .collection('gifs')
+                .where('id',
+                whereIn: gifIds.isNotEmpty
+                    ? gifIds
+                    : ['placeholder']) // Boş liste hatası almamak için
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting &&
+                  !snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                // Stream'den veri gelmiyorsa veya boşsa, başlangıç listesine göre
+                // bir "Hiçbir şey yok" mesajı göster.
+                return Center(child: Text(l10n.nothingHereYet));
+              }
+
+              // Gelen canlı dökümanları, ProfileProvider'daki orijinal sıraya göre diziyoruz.
+              final liveDocs = snapshot.data!.docs;
+              final sortedDocs =
+              List<QueryDocumentSnapshot<Map<String, dynamic>>>.from(
+                  liveDocs)
+                ..sort((a, b) =>
+                    gifIds.indexOf(a.id).compareTo(gifIds.indexOf(b.id)));
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 10.0),
+                itemCount: sortedDocs.length,
+                itemBuilder: (context, index) {
+                  // ARTIK DONMUŞ `items` LİSTESİ YERİNE, CANLI `sortedDocs` KULLANIYORUZ.
+                  final gifData = sortedDocs[index].data();
+                  final gifId = gifData['id'] as String? ?? '';
+                  if (gifId.isEmpty) return const SizedBox.shrink();
+
+                  // Bu kısım artık doğru çalışacak çünkü `gifData` her zaman en güncel veri.
+                  final List<dynamic> likedByList = gifData['likedBy'] ?? [];
+                  final likeCount = likedByList.length;
+                  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+                  final isLiked = (currentUserId != null)
+                      ? likedByList.contains(currentUserId)
+                      : false;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 25.0),
+                    child: MemePostCard(
+                      key: ValueKey(gifId),
+                      gifData: gifData,
+                      likeCount: likeCount,
+                      isLiked: isLiked,
+                      isSaved: profileProvider.isGifSaved(gifId),
+                      isProcessingLike:
+                      profileProvider.isProcessingLike(gifId),
+                      isProcessingSave:
+                      profileProvider.isProcessingSave(gifId),
+                      onLikePressed: () =>
+                          profileProviderForActions.toggleLikeGif(gifId),
+                      onSavePressed: () =>
+                          profileProviderForActions.toggleSaveGif(gifData),
+                    ),
+                  );
+                },
               );
             },
           );

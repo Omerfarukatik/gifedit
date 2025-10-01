@@ -1,157 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
-import 'package:memecreat/providers/profile_provider.dart';
-import 'package:provider/provider.dart';
 
+String _formatLikes(int count) {
+  // Bu fonksiyon aynı kalıyor...
+  if (count < 0) return '0';
+  if (count < 1000) return count.toString();
+  if (count < 1000000) return '${(count / 1000.0).toStringAsFixed(1)}K';
+  return '${(count / 1000000.0).toStringAsFixed(1)}M';
+}
+
+// BU WIDGET PROVIDER'I BİLMEZ. SADECE VERİ ALIR VE FONKSİYON TETİKLER.
 class MemePostCard extends StatelessWidget {
-  final String? username;
-  final String? userAvatarUrl;
-  final String? caption;
-  final int likeCount;
-  final String imageUrl;
-  final bool isAsset;
   final Map<String, dynamic> gifData;
+  final int likeCount;
+  final bool isLiked;
+  final bool isSaved;
+  final bool isProcessingLike;
+  final bool isProcessingSave;
+  final VoidCallback onLikePressed;
+  final VoidCallback onSavePressed;
 
   const MemePostCard({
     super.key,
-    this.username,
-    this.userAvatarUrl,
-    this.caption,
-    required this.likeCount,
-    required this.imageUrl,
-    this.isAsset = false,
     required this.gifData,
+    required this.likeCount,
+    required this.isLiked,
+    required this.isSaved,
+    required this.isProcessingLike,
+    required this.isProcessingSave,
+    required this.onLikePressed,
+    required this.onSavePressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    // LayoutBuilder bize üst widget'ın (ekranın) kısıtlamalarını verir.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final l10n = AppLocalizations.of(context)!;
-        final theme = Theme.of(context);
-        final cardColor = theme.cardColor;
-        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
-        final displayUsername = username ?? l10n.username;
-        final displayCaption = caption ?? '';
+    final username = gifData['creatorUsername'] ?? l10n.username;
+    final userAvatarUrl = gifData['creatorProfileUrl'] as String?;
+    final caption = gifData['caption'] as String? ?? '';
+    final imageUrl = gifData['gifUrl'] as String? ?? '';
 
-        return Container(
-          // Genişliği, LayoutBuilder'dan gelen maksimum genişlik olarak ayarlıyoruz.
-          // Bu, taşmayı imkansız kılar.
-          width: constraints.maxWidth,
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(16.0),
-            border: Border.all(color: Colors.grey.withOpacity(0.2)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            // Column'un çocuklarının taşmasını engellemek için.
-            mainAxisSize: MainAxisSize.min,
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Kullanıcı başlığı aynı kalıyor...
+          Row(
             children: [
-              // 1. Gönderi Başlığı
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundImage: (userAvatarUrl != null && userAvatarUrl!.isNotEmpty)
-                        ? CachedNetworkImageProvider(userAvatarUrl!)
-                        : null,
-                    child: (userAvatarUrl == null || userAvatarUrl!.isEmpty)
-                        ? const Icon(Icons.person)
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          displayUsername,
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        // Sabit metni l10n'dan alıyoruz.
-                        Text("posted2hAgo", style: theme.textTheme.bodySmall),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.more_horiz),
-                ],
+              CircleAvatar(
+                radius: 20,
+                backgroundImage: (userAvatarUrl != null && userAvatarUrl.isNotEmpty) ? CachedNetworkImageProvider(userAvatarUrl) : null,
+                child: (userAvatarUrl == null || userAvatarUrl.isEmpty) ? const Icon(Icons.person) : null,
               ),
-              const SizedBox(height: 16),
-
-              // 2. Resim/GIF Alanı
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
-                child: isAsset
-                    ? Image.asset(imageUrl, fit: BoxFit.cover, width: double.infinity)
-                    : CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  placeholder: (context, url) => Container(
-                    height: 250,
-                    color: theme.hoverColor,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 250,
-                    color: theme.hoverColor,
-                    child: const Icon(Icons.error),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // 3. Etkileşim Butonları (SORUNUN KAYNAĞI)
-              // Bu Row'u tekrar, Spacer ile düzgün bir şekilde kuruyoruz.
-              Row(
-                children: [
-                  IconButton(icon: const Icon(Icons.favorite_border), iconSize: 28, onPressed: () {}),
-                  const SizedBox(width: 8),
-                  IconButton(icon: const Icon(Icons.mode_comment_outlined), iconSize: 28, onPressed: () {}),
-                  const SizedBox(width: 8),
-                  IconButton(icon: const Icon(Icons.send_outlined), iconSize: 28, onPressed: () {}),
-                  const Spacer(), // Aradaki tüm boşluğu doldurur.
-                  Consumer<ProfileProvider>(
-                    builder: (context, provider, child) {
-                      final bool isSaved = provider.isGifSaved(gifData['id']);
-                      return IconButton(
-                        icon: Icon(
-                          isSaved ? Icons.bookmark : Icons.bookmark_border,
-                          color: isSaved ? theme.colorScheme.primary : null,
-                        ),
-                        iconSize: 28,
-                        onPressed: () {
-                          profileProvider.toggleSaveGif(gifData);
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Beğeni Sayısı
-              if (likeCount > 0) ...[
-                Text('$likeCount ${l10n.likes}'),
-                const SizedBox(height: 12),
-              ],
-
-              // Caption (Açıklama)
-              if (displayCaption.isNotEmpty)
-                Text(displayCaption),
+              const SizedBox(width: 12),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(username, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                Text("2h ago", style: theme.textTheme.bodySmall),
+              ],)),
+              const Icon(Icons.more_horiz),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 16),
+          // GIF'in kendisi aynı kalıyor...
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.0),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              placeholder: (c, u) => Container(height: 250, color: theme.hoverColor, child: const Center(child: CircularProgressIndicator())),
+              errorWidget: (c, u, e) => Container(height: 250, color: theme.hoverColor, child: const Icon(Icons.error)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Butonlar artık Provider'ı değil, doğrudan verilen fonksiyonları çağırır.
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border, color: isLiked ? Colors.redAccent : null),
+                iconSize: 28,
+                onPressed: isProcessingLike ? null : onLikePressed, // <<< DOĞRUDAN ÇAĞRI
+              ),
+              const SizedBox(width: 8),
+              IconButton(icon: const Icon(Icons.mode_comment_outlined), iconSize: 28, onPressed: () {}),
+              const SizedBox(width: 8),
+              IconButton(icon: const Icon(Icons.send_outlined), iconSize: 28, onPressed: () {}),
+              const Spacer(),
+              IconButton(
+                icon: Icon(isSaved ? Icons.bookmark : Icons.bookmark_border, color: isSaved ? theme.colorScheme.primary : null),
+                iconSize: 28,
+                onPressed: isProcessingSave ? null : onSavePressed, // <<< DOĞRUDAN ÇAĞRI
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Beğeni sayısı ve caption aynı kalıyor...
+          if (likeCount > 0)
+            Text('${_formatLikes(likeCount)} ${l10n.likes}', style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          if (caption.isNotEmpty)
+            RichText(text: TextSpan(style: theme.textTheme.bodyMedium, children: [
+              TextSpan(text: '$username ', style: const TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(text: caption),
+            ],),),
+        ],
+      ),
     );
   }
 }
