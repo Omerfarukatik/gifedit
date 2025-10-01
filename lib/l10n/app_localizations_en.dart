@@ -295,4 +295,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get likes => 'likes';
+
+  @override
+  String get thisMayTakeAMoment => 'This May Take a Moment';
+
+  @override
+  String get creatingYourMasterpiece => 'Creating Your Masterpiece';
 }

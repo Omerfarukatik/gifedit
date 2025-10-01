@@ -670,6 +670,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'likes'**
   String get likes;
+
+  /// No description provided for @thisMayTakeAMoment.
+  ///
+  /// In en, this message translates to:
+  /// **'This May Take a Moment'**
+  String get thisMayTakeAMoment;
+
+  /// No description provided for @creatingYourMasterpiece.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating Your Masterpiece'**
+  String get creatingYourMasterpiece;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

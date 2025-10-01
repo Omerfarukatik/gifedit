@@ -1,9 +1,10 @@
-// lib/result_page.dart
+// lib/screens/result_page.dart (YENİ, GÜZELLEŞTİRİLMİŞ ZAFER SAHNESİ)
 
 import 'package:flutter/material.dart';
+import 'package:transparent_image/transparent_image.dart'; // FadeInImage için gerekli. pubspec.yaml'a ekle!
 
 class ResultPage extends StatelessWidget {
-  final String resultGifUrl;
+  final String resultGifUrl; // Parametre adını 'gifUrl' olarak standartlaştıralım.
 
   const ResultPage({
     super.key,
@@ -12,65 +13,129 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Önceki sayfaya ve en başa (ana sayfaya) gitmek için Navigator'ı alalım.
+    final navigator = Navigator.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('İşte Eserin!'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false, // Geri tuşunu kaldırıyoruz, kontrol bizde.
       ),
-      backgroundColor: Colors.black,
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView( // Farklı ekran boyutlarında taşmayı önler.
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 'Tebrikler Kanka!',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
+              const Text(
+                'Eserin şimdi tüm dünyayla paylaşılmaya hazır.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 40),
 
-              // İşte o sihirli an! GIF'i gösteriyoruz.
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
-                child: Image.network(
-                  resultGifUrl,
-                  // Yüklenirken bir animasyon gösterelim
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return const CircularProgressIndicator(
-                      color: Colors.white,
-                    );
-                  },
-                  // Hata olursa diye bir ikon gösterelim
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.error_outline,
-                      color: Colors.red,
-                      size: 100,
-                    );
-                  },
+              // === ZAFER ANI: PARLAYAN GIF ===
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColor.withOpacity(0.5),
+                      blurRadius: 20.0,
+                      spreadRadius: 2.0,
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  // ESKİ Image.network YERİNE FadeInImage.
+                  // `precacheImage` sayesinde placeholder hiç görünmeyecek, direkt resim gelecek.
+                  child: FadeInImage.memoryNetwork(
+                    placeholder: kTransparentImage, // Şeffaf bir placeholder
+                    image: resultGifUrl,
+                    fit: BoxFit.contain,
+                    // Hata olursa diye bir ikon gösterelim
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          color: Colors.red,
+                          size: 100,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 50),
+
+              // === EYLEM BUTONLARI ===
+
+              // 1. UYGULAMA İÇİ PAYLAŞMA
               ElevatedButton.icon(
-                icon: const Icon(Icons.share),
-                label: const Text('Paylaş (Yakında)'),
+                icon: const Icon(Icons.public),
+                label: const Text('Toplulukla Paylaş'),
                 onPressed: () {
-                  // TODO: Paylaşma fonksiyonunu buraya ekleyeceğiz.
+                  // TODO: Firebase'e veya backend'e yükleyip "Feed"e ekleme fonksiyonu.
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Paylaşma özelliği yakında eklenecek!')),
+                    const SnackBar(content: Text('Eserin toplulukla paylaşıldı! (Yakında)')),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  minimumSize: const Size(double.infinity, 50),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
+              ),
+
+              const SizedBox(height: 15),
+
+              Row(
+                children: [
+                  // 2. YENİ BİR TANE DAHA YAP
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        // Mevcut ResultPage'i kapatıp bir önceki sayfaya (GifSelection) döner.
+                        if (navigator.canPop()) {
+                          navigator.pop();
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 45),
+                      ),
+                      child: const Text('Yeni Yap'),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  // 3. ANA SAYFAYA DÖN
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        // Mevcut ekran dahil, ana sayfaya kadar olan tüm ekranları kapatır.
+                        navigator.popUntil((route) => route.isFirst);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 45),
+                      ),
+                      child: const Text('Ana Sayfa'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -79,3 +144,4 @@ class ResultPage extends StatelessWidget {
     );
   }
 }
+

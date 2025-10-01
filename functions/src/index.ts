@@ -177,6 +177,7 @@ export const createGif = onRequest(
 
         // A) Ana 'gifs' koleksiyonuna kaydet
         batch.set(newGifRef, {
+            id: newGifId,
             gifUrl: finalPermanentUrl,
             creatorId: userId,
             creatorUsername: userDoc.data()?.username || 'bilinmiyor',
@@ -231,6 +232,94 @@ export const createGif = onRequest(
         }
       }
     });
+    busboy.end(request.rawBody);
+  }
+);
+
+// index.ts dosyasının içindeki mevcut toggleLike fonksiyonunu sil ve bunu yapıştır.
+export const toggleLike = onRequest(
+  { region: "europe-west1" },
+  async (request, response) => {
+    // CORS ayarları aynı
+    response.set("Access-Control-Allow-Origin", "*");
+    if (request.method === "OPTIONS") {
+      response.set("Access-Control-Allow-Methods", "POST");
+      response.set("Access-Control-Allow-Headers", "Content-Type");
+      response.set("Access-Control-Max-Age", "3600");
+      response.status(204).send("");
+      return;
+    }
+
+    // ARTIK JSON BODY DEĞİL, FORM-DATA BEKLİYORUZ
+    const busboy = Busboy({ headers: request.headers });
+    const fields: { [key: string]: string } = {};
+
+    busboy.on("field", (fieldname, val) => {
+      fields[fieldname] = val;
+    });
+
+    busboy.on("finish", async () => {
+      try {
+        const { userId, gifId } = fields;
+
+        if (!userId || !gifId) {
+          logger.error("Eksik form alanları:", { userId, gifId });
+          response.status(400).send({
+            success: false,
+            error: "İstek içinde 'userId' ve 'gifId' alanları zorunludur.",
+          });
+          return;
+        }
+
+        logger.info(`toggleLike işlemi: Kullanıcı=${userId}, GIF=${gifId}`);
+
+        const gifRef = db.collection("gifs").doc(gifId);
+        const userLikeRef = db.collection("users").doc(userId).collection("likedGifs").doc(gifId);
+
+        await db.runTransaction(async (transaction) => {
+          const userLikeDoc = await transaction.get(userLikeRef);
+          const gifDoc = await transaction.get(gifRef);
+
+          if (!gifDoc.exists) {
+            throw new Error(`Beğenilmeye çalışılan GIF bulunamadı: ${gifId}`);
+          }
+
+          const gifData = gifDoc.data();
+          if (!gifData) {
+            throw new Error(`GIF verisi okunamadı: ${gifId}`);
+          }
+
+          const currentLikeCount = gifData.likes || 0;
+
+          if (userLikeDoc.exists) {
+            // Beğeniyi Geri Al
+            transaction.delete(userLikeRef);
+            transaction.update(gifRef, { likes: currentLikeCount > 0 ? currentLikeCount - 1 : 0 });
+            logger.info(`Kullanıcı ${userId}, ${gifId} beğenisini geri aldı.`);
+          } else {
+            // Beğen
+            transaction.set(userLikeRef, {
+              ...gifData,
+              id: gifId,
+              likedAt: new Date(),
+            });
+            transaction.update(gifRef, { likes: currentLikeCount + 1 });
+            logger.info(`Kullanıcı ${userId}, ${gifId} GIF'ini beğendi.`);
+          }
+        });
+
+        response.status(200).send({
+          success: true,
+          message: "Beğeni durumu başarıyla güncellendi.",
+        });
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Bilinmeyen sunucu hatası.";
+        logger.error("toggleLike busboy.on('finish') hatası:", { error: errorMessage });
+        response.status(500).send({ success: false, error: `Beğeni işlemi sırasında bir hata oluştu: ${errorMessage}` });
+      }
+    });
+
     busboy.end(request.rawBody);
   }
 );

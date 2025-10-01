@@ -295,4 +295,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get likes => 'beğeni';
+
+  @override
+  String get thisMayTakeAMoment => 'Bu biraz zaman alabilir.';
+
+  @override
+  String get creatingYourMasterpiece => 'Senin Eserin Oluşturuluyor';
 }
