@@ -265,4 +265,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourGif => 'Your GIF';
+
+  @override
+  String get noGifsSavedYet => 'No GIFs saved yet.';
+
+  @override
+  String get noGifsCreatedYet => 'No GIFs created yet.';
+
+  @override
+  String get pleaseLoginToSeeProfile => 'Please login to see your profile.';
+
+  @override
+  String get processYourFace => 'Process Your Face';
+
+  @override
+  String get gifPreview => 'GIF Preview';
+
+  @override
+  String get proBenefitsSubtitle => 'Pro Benefits';
+
+  @override
+  String get goPro => 'GO PRO';
+
+  @override
+  String get nothingHereYet => 'Nothing here yet';
+
+  @override
+  String get gifNotFound => 'GIF Not Found';
+
+  @override
+  String get likes => 'likes';
 }

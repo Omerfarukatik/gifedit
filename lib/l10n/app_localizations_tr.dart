@@ -265,4 +265,34 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get yourGif => 'Gifiniz';
+
+  @override
+  String get noGifsSavedYet => 'Henüz GIF kaydedilmedi.';
+
+  @override
+  String get noGifsCreatedYet => 'Henüz GIF oluşturulmadı.';
+
+  @override
+  String get pleaseLoginToSeeProfile => 'Lütfen profil sayfasını görmek için giriş yapın.';
+
+  @override
+  String get processYourFace => 'Yüzünü İşle';
+
+  @override
+  String get gifPreview => 'GIF Önizleme';
+
+  @override
+  String get proBenefitsSubtitle => 'PRO Üyelik';
+
+  @override
+  String get goPro => 'PRO OL';
+
+  @override
+  String get nothingHereYet => 'Henüz burada hiçbir şey yok.';
+
+  @override
+  String get gifNotFound => 'GIF Bulunamadı.';
+
+  @override
+  String get likes => 'beğeni';
 }

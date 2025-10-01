@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ApiService {
   final Dio _dio = Dio();
@@ -45,6 +46,12 @@ class ApiService {
       // --- ADIM 2: GÖNDERİLECEK VERİYİ LOGLA ---
       print("FormData oluşturuldu. Alanlar: ${formData.fields.map((e) => e.key).toList()}, Dosyalar: ${formData.files.map((e) => e.key).toList()}");
       print("Firebase Function'a istek gönderiliyor: $_cloudFunctionUrl");
+
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        throw Exception('Kullanıcı girişi yapılmamış!');
+      }
+      formData.fields.add(MapEntry('userId', userId));
 
       final response = await _dio.post(
         _cloudFunctionUrl,

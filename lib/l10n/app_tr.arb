@@ -92,5 +92,16 @@
   "pleaseSelectAnImageFirst": "Lütfen önce bir fotoğraf seçin.",
    "yourSelectedGif": "Seçilen GIF",
    "backToTemplates": "Şablonlara Geri Dön",
-   "yourGif": "Gifiniz"
+   "yourGif": "Gifiniz",
+   "noGifsSavedYet": "Henüz GIF kaydedilmedi.",
+   "noGifsCreatedYet": "Henüz GIF oluşturulmadı.",
+   "pleaseLoginToSeeProfile": "Lütfen profil sayfasını görmek için giriş yapın.",
+   "processYourFace": "Yüzünü İşle",
+   "gifPreview": "GIF Önizleme",
+   "proBenefitsSubtitle": "PRO Üyelik",
+   "goPro": "PRO OL",
+   "nothingHereYet": "Henüz burada hiçbir şey yok.",
+   "gifNotFound": "GIF Bulunamadı.",
+   "likes": "beğeni",
+
 }
