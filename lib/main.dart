@@ -13,6 +13,8 @@ import 'package:memecreat/theme/app_theme.dart';
 import 'package:memecreat/providers/creation_provider.dart'; 
 import 'package:memecreat/providers/localization_provider.dart';
 import 'package:memecreat/providers/auth_provider.dart'; // AuthProvider eklendi
+import 'package:memecreat/providers/profile_provider.dart';
+import 'package:memecreat/providers/gif_provider.dart';
 
 // --- EKRANLAR ---
 import 'package:memecreat/screens/onboarding/splash_screen.dart'; 
@@ -36,6 +38,8 @@ await FirebaseAppCheck.instance.activate(
         ChangeNotifierProvider(create: (_) => CreationProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()), 
         ChangeNotifierProvider(create: (_) => AuthProvider()), // Auth Provider eklendi
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => GifProvider()),
       ],
       child: const StitchDesignApp(), 
     ),

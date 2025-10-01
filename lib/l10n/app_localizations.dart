@@ -610,6 +610,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your GIF'**
   String get yourGif;
+
+  /// No description provided for @noGifsSavedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No GIFs saved yet.'**
+  String get noGifsSavedYet;
+
+  /// No description provided for @noGifsCreatedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No GIFs created yet.'**
+  String get noGifsCreatedYet;
+
+  /// No description provided for @pleaseLoginToSeeProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to see your profile.'**
+  String get pleaseLoginToSeeProfile;
+
+  /// No description provided for @processYourFace.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Your Face'**
+  String get processYourFace;
+
+  /// No description provided for @gifPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'GIF Preview'**
+  String get gifPreview;
+
+  /// No description provided for @proBenefitsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro Benefits'**
+  String get proBenefitsSubtitle;
+
+  /// No description provided for @goPro.
+  ///
+  /// In en, this message translates to:
+  /// **'GO PRO'**
+  String get goPro;
+
+  /// No description provided for @nothingHereYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get nothingHereYet;
+
+  /// No description provided for @gifNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'GIF Not Found'**
+  String get gifNotFound;
+
+  /// No description provided for @likes.
+  ///
+  /// In en, this message translates to:
+  /// **'likes'**
+  String get likes;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

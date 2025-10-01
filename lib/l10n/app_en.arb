@@ -93,6 +93,15 @@
   "pleaseSelectAnImageFirst": "Please select an image first",
   "yourSelectedGif": "Your Selected GIF",
   "backToTemplates": "Back to Templates",
-  "yourGif": "Your GIF"
-
+  "yourGif": "Your GIF",
+  "noGifsSavedYet": "No GIFs saved yet.",
+  "noGifsCreatedYet": "No GIFs created yet.",
+  "pleaseLoginToSeeProfile": "Please login to see your profile.",
+  "processYourFace": "Process Your Face",
+  "gifPreview": "GIF Preview",
+  "proBenefitsSubtitle": "Pro Benefits",
+  "goPro": "GO PRO",
+  "nothingHereYet": "Nothing here yet",
+  "gifNotFound": "GIF Not Found",
+  "likes": "likes",
 }
