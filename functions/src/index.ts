@@ -323,3 +323,4 @@ export const toggleLike = onRequest(
     busboy.end(request.rawBody);
   }
 );
+export * from "./sync"; // sync.ts dosyasındaki tüm export'ları dışarıya aç.
