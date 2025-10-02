@@ -1,18 +1,19 @@
-// lib/screens/main_screen_wrapper.dart
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Gerekli import eklendi
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
 
 // Tema ve Renkler
-import '../../theme/app_theme.dart'; 
+import '../../theme/app_theme.dart';
 
 // Tüm ana sayfaları içe aktar
+import 'gif_detail_page.dart'; // Gerekli import eklendi
 import 'profile_screen.dart';
 import 'home_screen.dart';
 import 'discover_screen.dart';
-import 'gif_upload_screen.dart'; 
+import 'gif_upload_screen.dart';
 
 // 'Öğren' sekmesi artık "Oluşturduklarım" ve "Kaydettiklerim"i gösterecek.
 class LearnScreen extends StatelessWidget {
@@ -40,7 +41,8 @@ class LearnScreen extends StatelessWidget {
             appBar: AppBar(
               title: Text(l10n.learn), // AppBar'da sadece başlık kalacak.
             ),
-            body: Column( // body'yi Column ile sarmalıyoruz.
+            body: Column(
+              // body'yi Column ile sarmalıyoruz.
               children: [
                 // TabBar artık body'nin bir parçası.
                 TabBar(
@@ -78,17 +80,23 @@ class LearnScreen extends StatelessWidget {
   }
 }
 
-// ProfileScreen'den buraya taşınan GIF grid widget'ı
+// ProfileScreen'den buraya taşınan ve tıklanabilir hale getirilen GIF grid widget'ı
 class _GifGrid extends StatelessWidget {
   final List<Map<String, dynamic>> gifs;
   final String noContentMessage;
-  const _GifGrid({super.key, required this.gifs, required this.noContentMessage});
+  const _GifGrid(
+      {super.key, required this.gifs, required this.noContentMessage});
 
   @override
   Widget build(BuildContext context) {
     if (gifs.isEmpty) {
       return Center(child: Text(noContentMessage));
     }
+
+    // userData'yı ve profileProvider'ı bir üst seviyeden (Consumer'dan) alıyoruz.
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final userData = profileProvider.userData; // Bu null olabilir, kontrol edeceğiz.
+
     return GridView.builder(
       key: key,
       padding: const EdgeInsets.all(4),
@@ -103,14 +111,47 @@ class _GifGrid extends StatelessWidget {
         final gifUrl = gifData['gifUrl'] as String?;
         if (gifUrl == null) return Container(color: Colors.red.shade100);
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(4.0),
-          child: CachedNetworkImage(
-            key: ValueKey(gifUrl),
-            imageUrl: gifUrl,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(color: Theme.of(context).cardColor),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+        // --- YÖNLENDİRME İÇİN DEĞİŞİKLİK ---
+        return GestureDetector(
+          onTap: () {
+            // Kullanıcı verisi yoksa bir şey yapma (güvenlik önlemi)
+            if (userData == null) return;
+
+            // Tıklandığında GifDetailPage'i aç ve verileri gönder
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  // Gerekli verileri gifData ve userData'dan güvenli bir şekilde alalım
+                  final List<dynamic> likedByList = gifData['likedBy'] ?? [];
+                  final currentUserId = userData['uid'];
+                  final postTimestamp = gifData['createdAt'] as Timestamp?;
+
+                  return GifDetailPage(
+                    gifUrl: gifData['gifUrl'] ?? '',
+                    // Bu ekranda yazar her zaman mevcut kullanıcıdır.
+                    userName: userData['username'] ?? 'Bilinmeyen Kullanıcı',
+                    userProfileImageUrl: userData['avatar_url'] ?? '',
+                    description: gifData['description'] ?? 'Açıklama yok',
+                    postDate: postTimestamp?.toDate().toString().substring(0, 10) ??
+                        'Bilinmeyen tarih',
+                    likeCount: likedByList.length,
+                    isLiked: likedByList.contains(currentUserId),
+                  );
+                },
+              ),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4.0),
+            child: CachedNetworkImage(
+              key: ValueKey(gifUrl),
+              imageUrl: gifUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) =>
+                  Container(color: Theme.of(context).cardColor),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
           ),
         );
       },
@@ -126,7 +167,7 @@ class MainScreenWrapper extends StatefulWidget {
 }
 
 class _MainScreenWrapperState extends State<MainScreenWrapper> {
- int _selectedIndex = 0;
+  int _selectedIndex = 0;
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -152,10 +193,10 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
     final isDark = theme.brightness == Brightness.dark;
 
     // Navigasyon Çubuğu Arka Plan Rengi: Temaya Duyarlı
-    final navBarBackgroundColor = isDark 
-      ? const Color(0xFF1B0C27) // Koyu tema için koyu mor/siyah tonu
-      : AppColors.cardColorLight; // Açık tema için kart rengi (Beyaz/Açık Gri)
-      
+    final navBarBackgroundColor = isDark
+        ? const Color(0xFF1B0C27) // Koyu tema için koyu mor/siyah tonu
+        : AppColors.cardColorLight; // Açık tema için kart rengi (Beyaz/Açık Gri)
+
     // İkon Renkleri: Temaya Duyarlı
     final selectedColor = theme.colorScheme.primary; // Mor vurgu
     final unselectedColor = theme.hintColor.withOpacity(0.7); // Temaya duyarlı gri
@@ -164,25 +205,29 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
       body: Center(
         child: _screens.elementAt(_selectedIndex),
       ),
-      
       bottomNavigationBar: BottomNavigationBar(
         // TEMA DUYARLI ARKA PLAN
-        backgroundColor: navBarBackgroundColor, 
-        
+        backgroundColor: navBarBackgroundColor,
+
         // TEMA DUYARLI ÖĞE RENKLERİ
         selectedItemColor: selectedColor,
         unselectedItemColor: unselectedColor,
-        
+
         type: BottomNavigationBarType.fixed,
 
         items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.home), label: l10n.home),
-          BottomNavigationBarItem(icon: const Icon(Icons.explore), label: l10n.discover),
-          BottomNavigationBarItem(icon: const Icon(Icons.add_circle_outline), label: l10n.create),
-          BottomNavigationBarItem(icon: const Icon(Icons.school), label: l10n.learn),
-          BottomNavigationBarItem(icon: const Icon(Icons.person), label: l10n.profile),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.home), label: l10n.home),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.explore), label: l10n.discover),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.add_circle_outline), label: l10n.create),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.school), label: l10n.learn),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.person), label: l10n.profile),
         ],
-        
+
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
       ),

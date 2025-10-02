@@ -42,6 +42,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get forgotPassword => 'Şifremi Unuttum?';
 
   @override
+  String get rememberMe => 'Beni Hatırla';
+
+  @override
   String get orContinueWith => 'Veya şununla devam et';
 
   @override
