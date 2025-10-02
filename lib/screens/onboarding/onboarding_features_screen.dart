@@ -214,26 +214,51 @@ class OnboardingFeaturesScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    // ... (Dotlar, Görsel ve Başlık kısmı)
+                    // Görsel Alanı
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0), // Dikey boşluğu azaltarak görseli büyütüyoruz
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            'assets/pictures/gem22.png', // GÖRSEL YOLU
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                  color: primaryColor.withOpacity(0.2),
+                                  child: const Icon(Icons.interests_outlined, size: 80));
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Başlık
                     Text(
                       l10n.memeCreationDescription, // Örnek bir metin key'i
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, height: 1.25, color: primaryTextColor),
+                      style: TextStyle(
+                          fontSize: 26.0,
+                          fontWeight: FontWeight.bold,
+                          height: 1.25,
+                          color: primaryTextColor),
                     ),
+                    const Spacer(), // Buton ile metin arasına boşluk ekler
                   ],
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0),
-              child: ElevatedButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const OnboardingCallToActionScreen()),
-                ),
-                child: Text(l10n.next),
-              ),
-            ),
+            Padding( // Buton
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const OnboardingCallToActionScreen()),
+                  ),
+                  child: Text(l10n.next),
+                )),
           ],
         ),
       ),

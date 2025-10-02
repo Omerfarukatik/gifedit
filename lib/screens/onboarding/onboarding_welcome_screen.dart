@@ -223,33 +223,73 @@ class OnboardingWelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final primaryTextColor = Theme.of(context).textTheme.bodyMedium!.color;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
+            // Header - Skip Butonu
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0, top: 8.0),
+                  child: TextButton(
                     onPressed: () => Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()),
                     ),
                     child: Text(l10n.skip, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+
+            // Ana İçerik
             Expanded(
-              child: Center(
-                child: Text(l10n.welcomeTitle, style: TextStyle(fontSize: 24)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Görsel Alanı
+                    Container(
+                      width: 300,
+                      height: 400,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/pictures/1.png', // GÖRSEL YOLU
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                                color: primaryColor.withOpacity(0.2),
+                                child: const Icon(Icons.photo_size_select_actual_outlined, size: 80));
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    // Başlık
+                    Text(
+                      l10n.welcomeTitle,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: primaryTextColor),
+                    ),
+                  ],
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0),
+              padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 32.0),
               child: ElevatedButton(
                 onPressed: () => Navigator.push(
                   context,

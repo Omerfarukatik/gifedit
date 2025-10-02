@@ -12,6 +12,7 @@ class UserRepository {
     final initialLocaleCode = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
 
     final userData = {
+      'uid': user.uid, // EKLENDİ: Kullanıcı ID'sini belgeye ekle
       'avatarUrl': '',
       'email': user.email,
       'username': username,
@@ -28,5 +29,9 @@ class UserRepository {
   Future<Map<String, dynamic>?> getUserData(String userId) async {
     final doc = await _firestore.collection(_collection).doc(userId).get();
     return doc.data();
+  }
+
+  Future<void> updateUserData(String userId, Map<String, dynamic> data) async {
+    await _firestore.collection(_collection).doc(userId).update(data);
   }
 }

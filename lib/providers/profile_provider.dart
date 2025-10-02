@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:memecreat/services/storage_service.dart';
+import 'package:memecreat/services/user_repository.dart';
 
 class ProfileProvider with ChangeNotifier {
   // --- TEMEL SERVİSLER ---
@@ -24,6 +27,8 @@ class ProfileProvider with ChangeNotifier {
   // --- DURUM YÖNETİMİ ---
   bool _isLoading = true;
   String? _error;
+  final StorageService _storageService = StorageService(); // EKLENDİ
+  final UserRepository _userRepository = UserRepository(); // EKLENDİ
   final Set<String> _processingLikes = {}; // EKSİK PARÇA
   final Set<String> _processingSaves = {}; // Kaydetme işlemi için kilit
 
@@ -109,6 +114,51 @@ class ProfileProvider with ChangeNotifier {
   bool isProcessingLike(String gifId) => _processingLikes.contains(gifId);
 
   // --- AKSİYONLAR (BUTONLARIN ÇAĞIRDIĞI FONKSİYONLAR) ---
+
+  Future<void> updateUserProfile({
+    required String newUsername,
+    File? newAvatarFile,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception("Kullanıcı girişi yapılmamış.");
+
+    final updateData = <String, dynamic>{};
+    bool hasChanges = false;
+
+    // 1. Avatarı güncelle (eğer yeni dosya varsa)
+    if (newAvatarFile != null) {
+      final path = 'profile_pictures/${user.uid}/avatar.jpg';
+      final uploadedUrl = await _storageService.uploadFile(newAvatarFile, path);
+      if (uploadedUrl != null) {
+        updateData['avatarUrl'] = uploadedUrl;
+        hasChanges = true;
+      } else {
+        throw Exception("Profil fotoğrafı yüklenemedi.");
+      }
+    }
+
+    // 2. Kullanıcı adını güncelle (eğer değişmişse)
+    if (newUsername != _userData?['username']) {
+      updateData['username'] = newUsername;
+      hasChanges = true;
+    }
+
+    // 3. Değişiklik varsa Firestore'a yaz
+    if (hasChanges) {
+      await _userRepository.updateUserData(user.uid, updateData);
+      // Stream zaten dinlediği için notifyListeners() çağırmaya gerek yok,
+      // Firestore değişikliği otomatik olarak UI'a yansıtacaktır.
+    }
+  }
+
+  /// Kullanıcının dil tercihini Firestore'da günceller.
+  Future<void> updateUserLanguage(String localeCode) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    // settings.locale alanını güncelle
+    await _userRepository.updateUserData(user.uid, {'settings.locale': localeCode});
+  }
 
   Future<void> toggleSaveGif(Map<String, dynamic> gifData) async {
     final user = _auth.currentUser;
