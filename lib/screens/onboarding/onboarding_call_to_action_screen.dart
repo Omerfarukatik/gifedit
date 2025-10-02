@@ -208,9 +208,30 @@ class OnboardingCallToActionScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Center(
-                child: Text(l10n.readyToStart, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryTextColor)), // Örnek metin
-              ),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Görsel Alanı (Genişletilmiş)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0), // Kenarlara biraz boşluk verelim
+                      child: Image.asset(
+                        'assets/pictures/gem3.png', // GÖRSEL YOLU
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.celebration_outlined,
+                              size: 80, color: primaryColor);
+                        },
+                      ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    // Başlık
+                    Text(l10n.readyToStart,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 26, fontWeight: FontWeight.bold, color: primaryTextColor)),
+                  ]),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0),

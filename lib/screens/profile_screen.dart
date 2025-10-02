@@ -6,6 +6,10 @@ import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/theme_provider.dart';
 import 'package:memecreat/providers/profile_provider.dart';
 import 'package:memecreat/screens/subscriptions_screen.dart';
+import 'package:memecreat/providers/auth_provider.dart';
+import 'package:memecreat/screens/login.dart';
+import 'package:memecreat/screens/edit_profile_screen.dart';
+import 'package:memecreat/providers/localization_provider.dart';
 
 // Ekran artık `StatelessWidget`, çünkü durumu Provider yönetiyor.
 class ProfileScreen extends StatelessWidget {
@@ -44,87 +48,150 @@ class ProfileScreen extends StatelessWidget {
 
         // Durum 3: Veriler başarıyla geldi, arayüzü çiz
         final userData = profileProvider.userData!;
-        final createdGifs = profileProvider.createdGifs;
-        final savedGifs = profileProvider.savedGifs;
 
-        return DefaultTabController(
-          length: 2,
-          child: Scaffold(
+        return Scaffold(
             appBar: AppBar(
               title: Text(l10n.profile),
               elevation: 0,
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SubscriptionsScreen()),
-                    );
-                  },
+                  icon: const Icon(Icons.logout),
+                  onPressed: () => _showLogoutConfirmationDialog(context),
                 ),
               ],
             ),
             body: RefreshIndicator(
               onRefresh: () => profileProvider.refreshData(), // Ekranı aşağı çekerek yenileme
-              child: Column(
-                children: [
-                  // 1. Üst Bölüm: Dinamik Avatar ve İstatistikler
-                  _ProfileHeader(userData: userData),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // 1. Üst Bölüm: Dinamik Avatar ve İstatistikler
+                    _ProfileHeader(userData: userData),
 
-                  // 2. TEMA AYARLARI
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 10.0),
-                    child: _ThemeToggle(),
-                  ),
-                  const Divider(height: 1),
+                    const Divider(height: 1),
 
-                  // 3. TabBar (Sekmeli Menü)
-                  _TabBar(l10n: l10n),
+                    // 2. ABONELİK AYARLARI KARTI
+                    const _SubscriptionSettingsCard(),
+                    const Divider(height: 1),
 
-                  // 4. İçerik Akışı (Sekme İçeriği)
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        // #################### ASIL DÜZELTME BURADA ####################
-                        _GifGrid(
-                          // KEY'e listenin uzunluğunu ekliyoruz.
-                          // Bu, liste uzunluğu değiştiğinde Flutter'a "Bu YEPYENİ bir widget" der.
-                            key: ValueKey('created_gifs_${createdGifs.length}'),
-                            gifs: createdGifs,
-                            noContentMessage: l10n.noGifsCreatedYet
-                        ),
-                        _GifGrid(
-                          // Aynısını kaydedilenler için de yapalım.
-                            key: ValueKey('saved_gifs_${savedGifs.length}'),
-                            gifs: savedGifs,
-                            noContentMessage: l10n.noGifsSavedYet
-                        ),
-                        // #################################################################
-                      ],
-                    ),
-                  ),
-                ],
+                    // 3. GÖRÜNÜM AYARLARI
+                    const _ThemeSettingsWidget(),
+                    const Divider(height: 1),
+
+                    // 4. DİL AYARLARI
+                    const _LanguageSettingsWidget(),
+                    const Divider(height: 1),
+                  ],
+                ),
               ),
             ),
-          ),
         );
       },
     );
   }
 }
 
+/// Çıkış yapma işlemi için onay diyaloğu gösterir.
+Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
+  // Diyalog gösterilmeden önce l10n ve provider'ları alalım.
+  final l10n = AppLocalizations.of(context)!;
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-// --- ARAYÜZ PARÇALARI (DEĞİŞİKLİK YOK, AMA TAM KOD İÇİN BURADALAR) ---
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        title: Text(l10n.logOut),
+        content: const Text("Çıkış yapmak istediğinizden emin misiniz?"), // TODO: Yerelleştir
+        actions: <Widget>[
+          TextButton(
+            child: const Text("Vazgeç"), // TODO: Yerelleştir
+            onPressed: () {
+              Navigator.of(dialogContext).pop(); // Sadece diyaloğu kapat
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(l10n.logOut),
+            onPressed: () async {
+              // Önce diyaloğu kapat
+              Navigator.of(dialogContext).pop();
+
+              // Sonra çıkış işlemini gerçekleştir
+              await authProvider.signOut();
+
+              // Ana widget'ın hala ekranda olduğundan emin ol
+              if (!context.mounted) return;
+
+              // Kullanıcıyı giriş ekranına yönlendir ve geri dönememesini sağla
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (Route<dynamic> route) => false,
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+/// Profil ekranı için Dil Ayarları widget'ı.
+class _LanguageSettingsWidget extends StatelessWidget {
+  const _LanguageSettingsWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final localeProvider = Provider.of<LocaleProvider>(context);
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final currentLocale = localeProvider.locale;
+
+    void changeLocale(String languageCode) {
+      // Hem lokal state'i hem de veritabanını güncelle
+      localeProvider.setLocale(Locale(languageCode));
+      profileProvider.updateUserLanguage(languageCode);
+    }
+
+    return ExpansionTile(
+      leading: const Icon(Icons.language_outlined, size: 28),
+      title: const Text(
+        "Dil Ayarları", // TODO: Yerelleştir
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+      initiallyExpanded: false,
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+      children: [
+        RadioListTile<String>(
+          title: const Text('Türkçe'),
+          value: 'tr',
+          groupValue: currentLocale.languageCode,
+          onChanged: (value) {
+            if (value != null) {
+              changeLocale(value);
+            }
+          },
+        ),
+        RadioListTile<String>(
+          title: const Text('English'),
+          value: 'en',
+          groupValue: currentLocale.languageCode,
+          onChanged: (value) {
+            if (value != null) {
+              changeLocale(value);
+            }
+          },
+        ),
+      ],
+    );
+  }
+}
+
 
 class _ProfileHeader extends StatelessWidget {
   final Map<String, dynamic> userData;
   const _ProfileHeader({required this.userData});
 
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
@@ -132,7 +199,7 @@ class _ProfileHeader extends StatelessWidget {
 
     // Verileri Map'ten al
     final username = userData['username'] ?? l10n.username;
-    final avatarUrl = userData['avatar_url'] as String?;
+    final avatarUrl = userData['avatarUrl'] as String?; // 'avatar_url' -> 'avatarUrl' olarak düzeltildi
     final stats = userData['stats'] as Map<String, dynamic>? ?? {};
     final creationsCount = stats['creationsCount'] ?? 0;
     final totalLikes = stats['totalLikes'] ?? 0;
@@ -168,6 +235,22 @@ class _ProfileHeader extends StatelessWidget {
               _StatColumn(label: l10n.followerStat, value: followerCount),
             ],
           ),
+          const SizedBox(height: 20),
+          // Profili Düzenle Butonu
+          OutlinedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfileScreen(userData: userData),
+                ),
+              );
+            },
+            child: const Text("Profili Düzenle"), // TODO: Yerelleştir
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: theme.hintColor),
+            ),
+          ),
         ],
       ),
     );
@@ -201,70 +284,57 @@ class _StatColumn extends StatelessWidget {
   }
 }
 
-class _TabBar extends StatelessWidget implements PreferredSizeWidget {
-  final AppLocalizations l10n;
-  const _TabBar({required this.l10n});
+/// Profil ekranında abonelik durumunu gösteren ve detay sayfasına yönlendiren kart.
+class _SubscriptionSettingsCard extends StatelessWidget {
+  const _SubscriptionSettingsCard();
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    return TabBar(
-      indicatorColor: theme.colorScheme.primary,
-      labelColor: theme.colorScheme.primary,
-      unselectedLabelColor: theme.hintColor,
-      tabs: [
-        Tab(text: l10n.created, icon: const Icon(Icons.grid_on)),
-        Tab(text: l10n.saved, icon: const Icon(Icons.bookmark)),
-      ],
-    );
-  }
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
 
-class _GifGrid extends StatelessWidget {
-  final List<Map<String, dynamic>> gifs;
-  final String noContentMessage;
-  // super.key'i GridView.builder'a aktarıyoruz.
-  const _GifGrid({super.key, required this.gifs, required this.noContentMessage});
-
-  @override
-  Widget build(BuildContext context) {
-    if (gifs.isEmpty) {
-      return Center(child: Text(noContentMessage));
-    }
-    return GridView.builder(
-      key: key, // Bu, widget'ın kendi key'ini (ValueKey) GridView'e aktarır.
-      padding: const EdgeInsets.all(4),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 4.0,
-        mainAxisSpacing: 4.0,
-      ),
-      itemCount: gifs.length,
-      itemBuilder: (context, index) {
-        final gifData = gifs[index];
-        final gifUrl = gifData['gifUrl'] as String?;
-        if (gifUrl == null) return Container(color: Colors.red.shade100);
-
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(4.0),
-          child: CachedNetworkImage(
-            // Her bir resme de kendi URL'sinden oluşan eşsiz bir key verelim.
-            key: ValueKey(gifUrl),
-            imageUrl: gifUrl,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(color: Theme.of(context).cardColor),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SubscriptionsScreen()),
         );
       },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: Row(
+          children: [
+            Icon(Icons.workspace_premium_outlined, color: theme.colorScheme.primary, size: 28),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.subscriptionManagement,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.currentPlanTitle, // "Mevcut Planınız: Stitch PRO"
+                    style: TextStyle(color: theme.hintColor, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16),
+          ],
+        ),
+      ),
     );
   }
 }
 
 
-class _ThemeToggle extends StatelessWidget {
+/// Profil ekranı için Görünüm Ayarları widget'ı.
+class _ThemeSettingsWidget extends StatelessWidget {
+  const _ThemeSettingsWidget();
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -276,49 +346,33 @@ class _ThemeToggle extends StatelessWidget {
     final primaryTextColor = theme.textTheme.bodyMedium!.color;
     final secondaryTextColor = theme.hintColor;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ExpansionTile(
+      leading: Icon(Icons.palette_outlined, color: primaryTextColor, size: 28),
+      title: Text(
+        l10n.appearanceSettings,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+      initiallyExpanded: true, // Bu bölümün başlangıçta açık gelmesini sağlar.
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+      expandedCrossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: Text(
-            l10n.appearanceSettings,
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: primaryTextColor),
-          ),
-        ),
-        ListTile(
-          title: Text(l10n.darkMode, style: TextStyle(color: primaryTextColor)),
-          trailing: Switch(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 10.0),
+          child: SwitchListTile(
+            contentPadding: EdgeInsets.zero, // Kenar boşluklarını sıfırla
+            title: Text(
+              l10n.darkMode,
+              style: TextStyle(color: primaryTextColor),
+            ),
+            subtitle: Text(
+              isDark ? "Koyu mod aktif" : "Açık mod aktif", // TODO: Yerelleştir
+              style: TextStyle(color: secondaryTextColor),
+            ),
             value: isDark,
-            onChanged: isSystem
-                ? null
-                : (val) {
-              themeProvider.setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+            onChanged: (isNowDark) {
+              themeProvider.setThemeMode(isNowDark ? ThemeMode.dark : ThemeMode.light);
             },
           ),
-          subtitle: isSystem
-              ? Text(l10n.customThemeDisabled,
-              style: TextStyle(color: secondaryTextColor))
-              : null,
-          enabled: !isSystem,
-        ),
-        SwitchListTile(
-          title: Text(l10n.useSystemSettings,
-              style: TextStyle(color: primaryTextColor)),
-          value: isSystem,
-          onChanged: (useSystem) {
-            themeProvider.setThemeMode(useSystem
-                ? ThemeMode.system
-                : (isDark ? ThemeMode.dark : ThemeMode.light));
-          },
-          subtitle: Text(
-              isSystem
-                  ? l10n.systemAutoSync
-                  : l10n.systemSettingDisabled,
-              style: TextStyle(color: secondaryTextColor)),
         ),
       ],
     );

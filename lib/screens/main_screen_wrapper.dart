@@ -1,5 +1,9 @@
 // lib/screens/main_screen_wrapper.dart
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:memecreat/l10n/app_localizations.dart';
+import 'package:memecreat/providers/profile_provider.dart';
+import 'package:provider/provider.dart';
 
 // Tema ve Renkler
 import '../../theme/app_theme.dart'; 
@@ -10,26 +14,109 @@ import 'home_screen.dart';
 import 'discover_screen.dart';
 import 'gif_upload_screen.dart'; 
 
-// 'Öğren' sekmesi için basit ve TEMA DUYARLI Placeholder
+// 'Öğren' sekmesi artık "Oluşturduklarım" ve "Kaydettiklerim"i gösterecek.
 class LearnScreen extends StatelessWidget {
   const LearnScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    // Rengi temadan alıyoruz
-    final primaryTextColor = Theme.of(context).textTheme.bodyMedium!.color;
-    
-    return Center(
-        child: Text(
-          "Öğrenme İçerikleri", 
-          style: TextStyle(
-                fontSize: 24, 
-                color: primaryTextColor // Metin rengini temaya göre ayarla
-            )
-        )
+    final l10n = AppLocalizations.of(context)!;
+
+    return Consumer<ProfileProvider>(
+      builder: (context, profileProvider, child) {
+        // Kullanıcı giriş yapmamışsa veya veri yükleniyorsa bilgi ver
+        if (profileProvider.userData == null) {
+          return Scaffold(
+            appBar: AppBar(title: Text(l10n.learn)),
+            body: Center(child: Text(l10n.pleaseLoginToSeeProfile)),
+          );
+        }
+
+        final createdGifs = profileProvider.createdGifs;
+        final savedGifs = profileProvider.savedGifs;
+
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.learn), // AppBar'da sadece başlık kalacak.
+            ),
+            body: Column( // body'yi Column ile sarmalıyoruz.
+              children: [
+                // TabBar artık body'nin bir parçası.
+                TabBar(
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  labelColor: Theme.of(context).colorScheme.primary,
+                  unselectedLabelColor: Theme.of(context).hintColor,
+                  tabs: [
+                    Tab(text: l10n.created, icon: const Icon(Icons.grid_on)),
+                    Tab(text: l10n.saved, icon: const Icon(Icons.bookmark)),
+                  ],
+                ),
+                // TabBarView'ı Expanded ile sarmalayarak kalan tüm alanı doldurmasını sağlıyoruz.
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _GifGrid(
+                        key: ValueKey('created_gifs_${createdGifs.length}'),
+                        gifs: createdGifs,
+                        noContentMessage: l10n.noGifsCreatedYet,
+                      ),
+                      _GifGrid(
+                        key: ValueKey('saved_gifs_${savedGifs.length}'),
+                        gifs: savedGifs,
+                        noContentMessage: l10n.noGifsSavedYet,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
+// ProfileScreen'den buraya taşınan GIF grid widget'ı
+class _GifGrid extends StatelessWidget {
+  final List<Map<String, dynamic>> gifs;
+  final String noContentMessage;
+  const _GifGrid({super.key, required this.gifs, required this.noContentMessage});
+
+  @override
+  Widget build(BuildContext context) {
+    if (gifs.isEmpty) {
+      return Center(child: Text(noContentMessage));
+    }
+    return GridView.builder(
+      key: key,
+      padding: const EdgeInsets.all(4),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 4.0,
+        mainAxisSpacing: 4.0,
+      ),
+      itemCount: gifs.length,
+      itemBuilder: (context, index) {
+        final gifData = gifs[index];
+        final gifUrl = gifData['gifUrl'] as String?;
+        if (gifUrl == null) return Container(color: Colors.red.shade100);
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(4.0),
+          child: CachedNetworkImage(
+            key: ValueKey(gifUrl),
+            imageUrl: gifUrl,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => Container(color: Theme.of(context).cardColor),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
+        );
+      },
+    );
+  }
+}
 
 class MainScreenWrapper extends StatefulWidget {
   const MainScreenWrapper({super.key});
@@ -57,6 +144,9 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    // Yerelleştirme verilerini almak için l10n nesnesini alıyoruz.
+    final l10n = AppLocalizations.of(context)!;
+
     // Mevcut temadan renkleri alıyoruz
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -85,12 +175,12 @@ class _MainScreenWrapperState extends State<MainScreenWrapper> {
         
         type: BottomNavigationBarType.fixed,
 
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Keşfet'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_outline), label: 'Oluştur'),
-          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Öğren'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+        items: [
+          BottomNavigationBarItem(icon: const Icon(Icons.home), label: l10n.home),
+          BottomNavigationBarItem(icon: const Icon(Icons.explore), label: l10n.discover),
+          BottomNavigationBarItem(icon: const Icon(Icons.add_circle_outline), label: l10n.create),
+          BottomNavigationBarItem(icon: const Icon(Icons.school), label: l10n.learn),
+          BottomNavigationBarItem(icon: const Icon(Icons.person), label: l10n.profile),
         ],
         
         currentIndex: _selectedIndex,
