@@ -304,4 +304,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get creatingYourMasterpiece => 'Creating Your Masterpiece';
+
+  @override
+  String get unknownDate => 'Unknown Date';
 }

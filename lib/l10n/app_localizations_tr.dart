@@ -304,4 +304,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get creatingYourMasterpiece => 'Senin Eserin Oluşturuluyor';
+
+  @override
+  String get unknownDate => 'Bilinmeyen Tarih';
 }

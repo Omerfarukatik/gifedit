@@ -688,6 +688,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creating Your Masterpiece'**
   String get creatingYourMasterpiece;
+
+  /// No description provided for @unknownDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Date'**
+  String get unknownDate;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

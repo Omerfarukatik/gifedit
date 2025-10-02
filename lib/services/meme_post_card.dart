@@ -1,12 +1,13 @@
-// lib/services/meme_post_card.dart
+// lib/services/meme_post_card.dart (YENİDEN TASARLANMIŞ, ŞIK VERSİYON)
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Tarih formatı için eklendi
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
-import 'package:memecreat/screens/gif_detail_page.dart'; // Detay sayfasına yönlendirme için eklendi
+import 'package:memecreat/screens/gif_detail_page.dart';
+import 'package:timeago/timeago.dart' as timeago; // ZAMAN FORMATI İÇİN EKLENDİ
 
-// Beğeni sayısını formatlayan yardımcı fonksiyon
+// Beğeni sayısını formatlayan yardımcı fonksiyon (Aynı kalıyor)
 String _formatLikes(int count) {
   if (count < 0) return '0';
   if (count < 1000) return count.toString();
@@ -24,6 +25,8 @@ class MemePostCard extends StatelessWidget {
   final bool isProcessingSave;
   final VoidCallback onLikePressed;
   final VoidCallback onSavePressed;
+  // TODO: Download fonksiyonu için bir callback ekle.
+  // final VoidCallback onDownloadPressed;
 
   const MemePostCard({
     super.key,
@@ -35,12 +38,14 @@ class MemePostCard extends StatelessWidget {
     required this.isProcessingSave,
     required this.onLikePressed,
     required this.onSavePressed,
+    // required this.onDownloadPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     // Verileri Map'ten güvenli bir şekilde alalım
     final username = gifData['creatorUsername'] ?? l10n.username;
@@ -48,163 +53,205 @@ class MemePostCard extends StatelessWidget {
     final caption = gifData['caption'] as String? ?? '';
     final imageUrl = gifData['gifUrl'] as String? ?? '';
     final postTimestamp = gifData['createdAt'] as Timestamp?;
+    final postDate = postTimestamp?.toDate();
+    // Zaman formatını dinamik hale getiriyoruz. (Örn: 5 dakika önce)
+    final timeAgoString = postDate != null ? timeago.format(postDate, locale: Localizations.localeOf(context).languageCode) : '';
 
-    // --- YÖNLENDİRME İÇİN DEĞİŞİKLİK ---
-    // En dıştaki Container, GestureDetector ile sarıldı.
-    return GestureDetector(
-      onTap: () {
-        // Tıklandığında GifDetailPage'i aç
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GifDetailPage(
-              gifUrl: imageUrl,
-              userName: username,
-              userProfileImageUrl: userAvatarUrl ?? '',
-              description: caption,
-              postDate: postTimestamp?.toDate().toString().substring(0, 10) ?? 'Bilinmeyen tarih',
-              likeCount: likeCount,
-              isLiked: isLiked,
-            ),
+
+    return Container(
+      // ESTETİK DEVRİM 1: Kartın etrafına zarif bir gölge eklendi.
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16.0),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black.withOpacity(0.4) : Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        );
-      },
-      // Opak bir davranış belirleyerek GestureDetector'ın boş alanlarda da tıklamayı algılamasını sağlıyoruz.
-      behavior: HitTestBehavior.opaque,
-      // ------------------------------------
-      child: Container(
-        // Kartların arasında dikey boşluk bırakmak için margin eklendi.
-        margin: const EdgeInsets.only(bottom: 16.0),
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(16.0),
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
-        ),
+        ],
+      ),
+      // Bütün içeriği, taşmaları önlemek ve köşeleri yuvarlatmak için ClipRRect içine alıyoruz.
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // KULLANICI BAŞLIĞI
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: (userAvatarUrl != null && userAvatarUrl.isNotEmpty)
-                      ? CachedNetworkImageProvider(userAvatarUrl)
-                      : null,
-                  child: (userAvatarUrl == null || userAvatarUrl.isEmpty)
-                      ? const Icon(Icons.person)
-                      : null,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        username,
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
+            // Tıklanabilir kullanıcı başlığı
+            GestureDetector(
+              onTap: () {
+                // TODO: Kullanıcının profiline gitme fonksiyonu
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: theme.colorScheme.secondary.withOpacity(0.2),
+                      backgroundImage: (userAvatarUrl != null && userAvatarUrl.isNotEmpty)
+                          ? CachedNetworkImageProvider(userAvatarUrl)
+                          : null,
+                      child: (userAvatarUrl == null || userAvatarUrl.isEmpty)
+                          ? const Icon(Icons.person, size: 24)
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            username,
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (timeAgoString.isNotEmpty)
+                            Text(timeAgoString, style: theme.textTheme.bodySmall),
+                        ],
                       ),
-                      // TODO: Bu '2h ago' kısmını dinamik hale getir (timeago.dart paketi ile)
-                      Text("2h ago", style: theme.textTheme.bodySmall),
-                    ],
-                  ),
+                    ),
+                    // "More" butonu biraz daha az yer kaplayabilir.
+                    IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () { /* Diğer seçenekler menüsü */ },
+                        icon: const Icon(Icons.more_horiz)
+                    ),
+                  ],
                 ),
-                IconButton(
-                    onPressed: () {
-                      /* Diğer seçenekler menüsü (Sil, Bildir vb.) */
-                    },
-                    icon: const Icon(Icons.more_horiz)),
-              ],
+              ),
             ),
-            const SizedBox(height: 16),
 
-            // GIF GÖRSELİ
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
+            // ESTETİK DEVRİM 2: GIF'e tıklandığında detay sayfasına gitmesi için GestureDetector.
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GifDetailPage(
+                      gifUrl: imageUrl,
+                      userName: username,
+                      userProfileImageUrl: userAvatarUrl ?? '',
+                      description: caption,
+                      postDate: postDate?.toString().substring(0, 10) ?? l10n.unknownDate,
+                      likeCount: likeCount,
+                      isLiked: isLiked,
+                    ),
+                  ),
+                );
+              },
               child: CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 width: double.infinity,
-                // Yüklenirken ve hata durumunda kartın boyutunun değişmemesi için AspectRatio kullanıldı.
                 placeholder: (context, url) => AspectRatio(
-                  aspectRatio: 1, // 1:1 kare oran
+                  aspectRatio: 4 / 3,
                   child: Container(
-                    color: theme.hoverColor,
-                    child: const Center(child: CircularProgressIndicator()),
+                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
                   ),
                 ),
                 errorWidget: (context, url, error) => AspectRatio(
-                  aspectRatio: 1,
+                  aspectRatio: 4 / 3,
                   child: Container(
-                    color: theme.hoverColor,
-                    child: const Icon(Icons.error),
+                    color: isDark ? Colors.grey[800] : Colors.grey[200],
+                    child: const Icon(Icons.broken_image),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
 
-            // AKSİYON BUTONLARI
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.redAccent : null),
-                  iconSize: 28,
-                  onPressed: isProcessingLike ? null : onLikePressed,
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                    icon: const Icon(Icons.mode_comment_outlined),
-                    iconSize: 28,
-                    onPressed: () {
-                      /* Yorumlar alanını aç */
-                    }),
-                const SizedBox(width: 8),
-                IconButton(
-                    icon: const Icon(Icons.send_outlined),
-                    iconSize: 28,
-                    onPressed: () {
-                      /* Paylaş menüsünü aç */
-                    }),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(
-                      isSaved ? Icons.bookmark : Icons.bookmark_border,
-                      color: isSaved ? theme.colorScheme.primary : null),
-                  iconSize: 28,
-                  onPressed: isProcessingSave ? null : onSavePressed,
-                ),
-              ],
+            // ESTETİK DEVRİM 3: Butonların ve yazıların olduğu daha temiz bir alt bölüm.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      // Beğeni butonu ve sayısı bir arada, daha kompakt.
+                      _buildActionButton(
+                        context,
+                        icon: isLiked ? Icons.favorite : Icons.favorite_border,
+                        label: _formatLikes(likeCount),
+                        color: isLiked ? Colors.redAccent : theme.iconTheme.color,
+                        onPressed: isProcessingLike ? null : onLikePressed,
+                      ),
+                      const SizedBox(width: 16),
+                      // BUTON REVİZYONU: YENİ İNDİRME BUTONU
+                      _buildActionButton(
+                        context,
+                        icon: Icons.download_outlined,
+                        label: "İNDİR",
+                        onPressed: () { /* TODO: İndirme fonksiyonu */ },
+                      ),
+                      const Spacer(),
+                      // Kaydetme butonu
+                      _buildActionButton(
+                        context,
+                        icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
+                        color: isSaved ? theme.colorScheme.primary : theme.iconTheme.color,
+                        onPressed: isProcessingSave ? null : onSavePressed,
+                      ),
+                    ],
+                  ),
+
+                  // Açıklama alanı sadece caption varsa gösterilir.
+                  if (caption.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    RichText(
+                      text: TextSpan(
+                        style: theme.textTheme.bodyMedium,
+                        children: [
+                          TextSpan(
+                              text: '$username ',
+                              style: const TextStyle(fontWeight: FontWeight.bold)
+                          ),
+                          TextSpan(text: caption),
+                        ],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ]
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
 
-            // BEĞENİ VE AÇIKLAMA
-            if (likeCount > 0)
+  // ESTETİK DEVRİM 4: Butonları ve yazılarını bir araya getiren yardımcı bir widget.
+  // Bu, kod tekrarını azaltır ve daha temiz bir yapı sağlar.
+  Widget _buildActionButton(BuildContext context, {required IconData icon, String? label, Color? color, VoidCallback? onPressed}) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        child: Row(
+          children: [
+            Icon(icon, color: onPressed == null ? Colors.grey : color, size: 24),
+            if (label != null && label.isNotEmpty) ...[
+              const SizedBox(width: 8.0),
               Text(
-                '${_formatLikes(likeCount)} ${l10n.likes}',
-                style: theme.textTheme.bodyLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            const SizedBox(height: 8),
-            if (caption.isNotEmpty)
-              RichText(
-                text: TextSpan(
-                  style: theme.textTheme.bodyMedium,
-                  children: [
-                    TextSpan(
-                        text: '$username ',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: caption),
-                  ],
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: onPressed == null ? Colors.grey : theme.textTheme.bodyMedium?.color
                 ),
-              ),
+              )
+            ],
           ],
         ),
       ),
     );
   }
 }
+
