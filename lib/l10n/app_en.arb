@@ -11,6 +11,7 @@
   "email": "Email",
   "password": "Password",
   "forgotPassword": "Forgot Password?",
+  "rememberMe": "Remember Me",
   "orContinueWith": "Or continue with",
   "dontHaveAccount": "Don't have an account?",
   "startCreatingNow": "Start Creating Now!",

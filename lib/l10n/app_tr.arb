@@ -11,6 +11,7 @@
   "email": "E-posta",
   "password": "Şifre",
   "forgotPassword": "Şifremi Unuttum?",
+  "rememberMe": "Beni Hatırla",
   "orContinueWith": "Veya şununla devam et",
   "dontHaveAccount": "Hesabın yok mu?",
   "startCreatingNow": "Hemen Oluşturmaya Başla!",
