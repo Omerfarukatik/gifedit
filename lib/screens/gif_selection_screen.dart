@@ -131,7 +131,7 @@ class _GifSelectionScreenState extends State<GifSelectionScreen> with TickerProv
     final primaryTextColor = theme.textTheme.bodyMedium!.color;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: _isLoading ? null : AppBar(
         title: Text(l10n.selectAGifTemplate),
         elevation: 0,
         centerTitle: true,
@@ -181,7 +181,7 @@ class _GifSelectionScreenState extends State<GifSelectionScreen> with TickerProv
                   top: _startAnimation ? MediaQuery.of(context).size.height / 2 - 200 : -300,
                   left: 0,
                   right: 0,
-                  child: Lottie.asset('assets/animations/magic_loading.json', width: 250, height: 250),
+                  child: Lottie.asset('assets/animations/magic_loading_2.json', width: 250, height: 250),
                 ),
 
                 // DİNAMİK METİN
