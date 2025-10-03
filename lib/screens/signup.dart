@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/auth_provider.dart';
 import 'main_screen_wrapper.dart';
-import 'login.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'package:provider/provider.dart'; 
 
 
@@ -64,9 +62,6 @@ class _SignupScreenState extends State<SignupScreen> {
     final theme = Theme.of(context);
     final primaryColor = theme.colorScheme.primary;
     final primaryTextColor = theme.textTheme.bodyMedium!.color;
-    final socialButtonColor = theme.brightness == Brightness.dark 
-                              ? Colors.white.withOpacity(0.05) 
-                              : Colors.grey.shade100;
     final secondaryTextColor = theme.hintColor;
     final l10n = AppLocalizations.of(context)!;
 
@@ -87,7 +82,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 // Kullanıcı Adı
                 TextFormField(
                   controller: _usernameController,
-                  decoration: InputDecoration(labelText: l10n.username), // Yerelleştirildi
+                  decoration: InputDecoration(labelText: l10n.usernameHint), // Yerelleştirildi
                   validator: (value) => value!.isEmpty ? l10n.enterUsername : null,
                 ),
                 const SizedBox(height: 24),

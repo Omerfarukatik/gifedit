@@ -47,6 +47,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate() || _isSaving) return;
 
     setState(() => _isSaving = true);
@@ -62,14 +63,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profil başarıyla güncellendi!'), backgroundColor: Colors.green),
+          SnackBar(content: Text(l10n.snackbarsuccesedprofileupdate), backgroundColor: Colors.purpleAccent),
         );
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profil güncellenirken bir hata oluştu: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text(l10n.snackbarfailedtoprofileupdate), backgroundColor: Colors.redAccent),
         );
       }
     } finally {
@@ -87,7 +88,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profili Düzenle"), // TODO: Yerelleştir
+        title: Text(l10n.editProfile),
+        // Arka planı sadeleştirmek için scaffold rengiyle aynı yapıp gölgeyi kaldırıyoruz.
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
         centerTitle: true,
         actions: [
           _isSaving
@@ -144,7 +148,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: _pickImage,
-                child: Text("Fotoğrafı Değiştir"), // TODO: Yerelleştir
+                child: Text(l10n.changeProfilePicture), 
               ),
               const SizedBox(height: 40),
 
@@ -152,12 +156,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextFormField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: l10n.username,
+                  labelText: l10n.usernameHint,
                   border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return l10n.enterUsername;
+                    return l10n.usernameHint;
                   }
                   return null;
                 },

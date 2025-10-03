@@ -174,9 +174,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appearanceSettings => 'Appearance Settings';
 
   @override
-  String get darkMode => 'Dark Mode';
-
-  @override
   String get customThemeDisabled => 'Custom theme disabled';
 
   @override
@@ -307,4 +304,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownDate => 'Unknown Date';
+
+  @override
+  String get usernameHint => 'Username';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get permissionRequiredForGallery => 'Permission required to save GIF to gallery.';
+
+  @override
+  String get gifSavedToGallery => 'GIF saved to gallery.';
+
+  @override
+  String get failedToSaveGif => 'Failed to save GIF.';
+
+  @override
+  String get failedToDownloadGif => 'Failed to download GIF.';
+
+  @override
+  String get newest => 'Newest';
+
+  @override
+  String get popular => 'Popular';
+
+  @override
+  String get trending => 'Trending';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get changeProfilePicture => 'Change Picture';
+
+  @override
+  String get snackbarsuccesedprofileupdate => 'Profile updated successfully.';
+
+  @override
+  String get snackbarfailedtoprofileupdate => 'Failed to update profile.';
+
+  @override
+  String get areyousuretoexit => 'Are you sure you want to exit the app?';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get lightMode => 'Light Mode';
+
+  @override
+  String get languageSettings => 'Language Settings';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get turkish => 'Turkish';
+
+  @override
+  String get english => 'English';
 }

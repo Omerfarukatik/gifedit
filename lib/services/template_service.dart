@@ -7,11 +7,7 @@ class TemplateService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'templates';
 
-  // Firestore'dan çekilecek dil sütununu belirler.
-  String _getLocaleField(BuildContext context) {
-    final currentLocaleCode = Localizations.localeOf(context).languageCode;
-    return currentLocaleCode == 'tr' ? 'name_tr' : 'name_en'; 
-  }
+
 
   /// Firestore'dan tüm şablonları çeker.
   Future<List<Template>> getTemplates(BuildContext context) async {

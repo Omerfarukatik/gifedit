@@ -59,7 +59,6 @@
   "restorePurchases": "Satın Alımları Geri Yükle",
   
   "appearanceSettings": "Görünüm Ayarları",
-  "darkMode": "Koyu Tema (Dark Mode)",
   "customThemeDisabled": "Özel tema devre dışı",
   "useSystemSettings": "Sistem Ayarını Kullan",
   "systemAutoSync": "Otomatik, cihaz ayarıyla senkronize",
@@ -106,6 +105,32 @@
    "likes": "beğeni",
    "thisMayTakeAMoment": "Bu biraz zaman alabilir.",
    "creatingYourMasterpiece": "Senin Eserin Oluşturuluyor",
-   "unknownDate": "Bilinmeyen Tarih"
+   "unknownDate": "Bilinmeyen Tarih",
+     "usernameHint": "Kullanıcı Adı",
+  "download": "İndir",
+  "share": "Paylaş",
+  "permissionRequiredForGallery": "Galeriye kaydetmek için izin vermelisiniz.",
+  "gifSavedToGallery": "GIF galeriye kaydedildi!",
+  "failedToSaveGif": "GIF galeriye kaydedilemedi.",
+  "failedToDownloadGif": "GIF indirilemedi.",
+  "newest": "En Yeniler",
+  "popular": "Popüler",
+  "trending": "Trendler",
+
+  "editProfile": "Profili Düzenle",
+  "changeProfilePicture": "Fotoğrafı Değiştir",
+
+  "snackbarsuccesedprofileupdate": "Profil başarıyla güncellendi.",
+  "snackbarfailedtoprofileupdate": "Profil güncellenemedi.",
+  "areyousuretoexit": "Uygulamadan çıkmak istediğinize emin misiniz?",
+  "cancel": "İptal",
+
+  "darkMode": "Koyu Tema",
+  "lightMode": "Açık Tema)",
+  "languageSettings": "Dil Ayarları",
+
+  "gallery": "Galeri",
+  "turkish": "Türkçe",
+  "english": "İngilizce"
 
 }

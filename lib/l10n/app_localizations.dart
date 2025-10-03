@@ -425,12 +425,6 @@ abstract class AppLocalizations {
   /// **'Appearance Settings'**
   String get appearanceSettings;
 
-  /// No description provided for @darkMode.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Mode'**
-  String get darkMode;
-
   /// No description provided for @customThemeDisabled.
   ///
   /// In en, this message translates to:
@@ -694,6 +688,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown Date'**
   String get unknownDate;
+
+  /// No description provided for @usernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get usernameHint;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @permissionRequiredForGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission required to save GIF to gallery.'**
+  String get permissionRequiredForGallery;
+
+  /// No description provided for @gifSavedToGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'GIF saved to gallery.'**
+  String get gifSavedToGallery;
+
+  /// No description provided for @failedToSaveGif.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save GIF.'**
+  String get failedToSaveGif;
+
+  /// No description provided for @failedToDownloadGif.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download GIF.'**
+  String get failedToDownloadGif;
+
+  /// No description provided for @newest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get newest;
+
+  /// No description provided for @popular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get popular;
+
+  /// No description provided for @trending.
+  ///
+  /// In en, this message translates to:
+  /// **'Trending'**
+  String get trending;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @changeProfilePicture.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Picture'**
+  String get changeProfilePicture;
+
+  /// No description provided for @snackbarsuccesedprofileupdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully.'**
+  String get snackbarsuccesedprofileupdate;
+
+  /// No description provided for @snackbarfailedtoprofileupdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile.'**
+  String get snackbarfailedtoprofileupdate;
+
+  /// No description provided for @areyousuretoexit.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to exit the app?'**
+  String get areyousuretoexit;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @lightMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Mode'**
+  String get lightMode;
+
+  /// No description provided for @languageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Settings'**
+  String get languageSettings;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @turkish.
+  ///
+  /// In en, this message translates to:
+  /// **'Turkish'**
+  String get turkish;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

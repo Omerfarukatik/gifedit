@@ -59,7 +59,6 @@
   "restorePurchases": "Restore Purchases",
 
   "appearanceSettings": "Appearance Settings",
-  "darkMode": "Dark Mode",
   "customThemeDisabled": "Custom theme disabled",
   "useSystemSettings": "Use System Settings",
   "systemAutoSync": "Automatic, synced with device settings",
@@ -107,5 +106,30 @@
   "likes": "likes",
   "thisMayTakeAMoment": "This May Take a Moment",
   "creatingYourMasterpiece": "Creating Your Masterpiece",
-  "unknownDate": "Unknown Date"
+  "unknownDate": "Unknown Date",
+  "usernameHint": "Username",
+  "download": "Download",
+  "share": "Share",
+  "permissionRequiredForGallery": "Permission required to save GIF to gallery.",
+  "gifSavedToGallery": "GIF saved to gallery.",
+  "failedToSaveGif": "Failed to save GIF.",
+  "failedToDownloadGif" : "Failed to download GIF.",
+  "newest": "Newest",
+  "popular": "Popular",
+  "trending": "Trending",
+  "editProfile": "Edit Profile",
+  "changeProfilePicture": "Change Picture",
+  "snackbarsuccesedprofileupdate": "Profile updated successfully.",
+  "snackbarfailedtoprofileupdate": "Failed to update profile.",
+
+  "areyousuretoexit": "Are you sure you want to exit the app?",
+  "cancel": "Cancel",
+
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "languageSettings": "Language Settings",
+
+  "gallery": "Gallery",
+  "turkish": "Turkish",
+  "english": "English"
 }

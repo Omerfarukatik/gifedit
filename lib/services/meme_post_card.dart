@@ -25,8 +25,7 @@ class MemePostCard extends StatelessWidget {
   final bool isProcessingSave;
   final VoidCallback onLikePressed;
   final VoidCallback onSavePressed;
-  // TODO: Download fonksiyonu için bir callback ekle.
-  // final VoidCallback onDownloadPressed;
+  final VoidCallback onDownloadPressed;
 
   const MemePostCard({
     super.key,
@@ -38,7 +37,7 @@ class MemePostCard extends StatelessWidget {
     required this.isProcessingSave,
     required this.onLikePressed,
     required this.onSavePressed,
-    // required this.onDownloadPressed,
+    required this.onDownloadPressed,
   });
 
   @override
@@ -185,8 +184,8 @@ class MemePostCard extends StatelessWidget {
                       _buildActionButton(
                         context,
                         icon: Icons.download_outlined,
-                        label: "İNDİR",
-                        onPressed: () { /* TODO: İndirme fonksiyonu */ },
+                        label: l10n.download, // Yerelleştirme için güncellendi
+                        onPressed: onDownloadPressed,
                       ),
                       const Spacer(),
                       // Kaydetme butonu
@@ -254,4 +253,3 @@ class MemePostCard extends StatelessWidget {
     );
   }
 }
-

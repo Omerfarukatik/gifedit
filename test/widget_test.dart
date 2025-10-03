@@ -1,30 +1,39 @@
 // This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memecreat/screens/onboarding/onboarding_welcome_screen.dart';
-import 'package:memecreat/main.dart' show MyApp;
+import 'package:memecreat/main.dart';
+import 'package:memecreat/providers/auth_provider.dart';
+import 'package:memecreat/providers/creation_provider.dart';
+import 'package:memecreat/providers/gif_provider.dart';
+import 'package:memecreat/providers/localization_provider.dart';
+import 'package:memecreat/providers/profile_provider.dart';
+import 'package:memecreat/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget( MyApp());
+  // Bu test, uygulamanın ana widget'ının (MyApp) hatasız bir şekilde
+  // oluşturulup oluşturulmadığını kontrol eder.
+  testWidgets('App starts without crashing smoke test', (WidgetTester tester) async {
+    // Uygulamayı, main.dart'taki gibi gerekli Provider'lar ile sarmalıyoruz.
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => CreationProvider()),
+          ChangeNotifierProvider(create: (_) => LocaleProvider()),
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
+          ChangeNotifierProvider(create: (_) => ProfileProvider()),
+          ChangeNotifierProvider(create: (_) => GifProvider()),
+        ],
+        child: const StitchDesignApp(), // Ana widget'ınız
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // pumpAndSettle, tüm animasyonların ve asenkron işlemlerin bitmesini bekler.
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Uygulamanın açılış ekranında bir Scaffold'un varlığını kontrol edelim.
+    expect(find.byType(Scaffold), findsAtLeastNWidgets(1));
   });
 }

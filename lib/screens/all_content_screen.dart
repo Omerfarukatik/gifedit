@@ -3,12 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/profile_provider.dart';
+import 'package:memecreat/services/download_service.dart';
 import 'package:memecreat/services/meme_post_card.dart';
 import 'package:provider/provider.dart';
 
 class AllContentScreen extends StatelessWidget {
   final String contentType;
   const AllContentScreen({super.key, required this.contentType});
+
+  // DownloadService'i burada da kullanmak için bir nesne oluşturalım.
+  static final DownloadService _downloadService = DownloadService();
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +80,7 @@ class AllContentScreen extends StatelessWidget {
                   // ARTIK DONMUŞ `items` LİSTESİ YERİNE, CANLI `sortedDocs` KULLANIYORUZ.
                   final gifData = sortedDocs[index].data();
                   final gifId = gifData['id'] as String? ?? '';
+                  final imageUrl = gifData['gifUrl'] as String? ?? '';
                   if (gifId.isEmpty) return const SizedBox.shrink();
 
                   // Bu kısım artık doğru çalışacak çünkü `gifData` her zaman en güncel veri.
@@ -102,6 +107,11 @@ class AllContentScreen extends StatelessWidget {
                           profileProviderForActions.toggleLikeGif(gifId),
                       onSavePressed: () =>
                           profileProviderForActions.toggleSaveGif(gifData),
+                      onDownloadPressed: () {
+                        if (imageUrl.isNotEmpty) {
+                          _downloadService.saveGifToGallery(context, imageUrl);
+                        }
+                      },
                     ),
                   );
                 },
