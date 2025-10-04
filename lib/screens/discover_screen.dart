@@ -18,6 +18,9 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen>
     with AutomaticKeepAliveClientMixin {
 
+  // Hangi GIF'in indirildiğini takip etmek için state değişkeni
+  String? _downloadingGifId;
+
   final DownloadService _downloadService = DownloadService(); // Servis'ten bir nesne oluştur
 
   @override
@@ -128,10 +131,18 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                             isProcessingSave: profileProvider.isProcessingSave(gifId),
                             onLikePressed: () => profileProviderForActions.toggleLikeGif(gifId),
                             onSavePressed: () => profileProviderForActions.toggleSaveGif(gifData),
-                            onDownloadPressed: () {
-                              if (imageUrl.isNotEmpty) _downloadService.saveGifToGallery(context, imageUrl);
-                              if (imageUrl.isNotEmpty) {
-                                _downloadService.saveGifToGallery(context, imageUrl);
+                            isDownloading: _downloadingGifId == gifId, // Bu kartın indirilip indirilmediğini kontrol et
+                            onDownloadPressed: () async {
+                              if (imageUrl.isNotEmpty && _downloadingGifId == null) {
+                                setState(() => _downloadingGifId = gifId); // İndirmeyi başlat
+                                try {
+                                  await _downloadService.saveGifToGallery(context, imageUrl);
+                                } finally {
+                                  // İşlem bitince (hata olsa bile) spinner'ı kaldır
+                                  if (mounted) {
+                                    setState(() => _downloadingGifId = null);
+                                  }
+                                }
                               }
                             },
                           ),

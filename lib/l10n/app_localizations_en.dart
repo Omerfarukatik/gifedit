@@ -144,7 +144,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionManagement => 'Subscription Management';
 
   @override
-  String get currentPlanTitle => 'Your Current Plan: Stitch PRO';
+  String get currentPlanTitle => 'Your Current Plan: ATİK PRO';
 
   @override
   String get nextRenewalDate => 'Next renewal date:';
@@ -370,4 +370,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get english => 'English';
+
+  @override
+  String get permissionPermanentlyDenied => 'Permission permanently denied. Please grant it from the app settings.';
+
+  @override
+  String get settings => 'SETTINGS';
 }

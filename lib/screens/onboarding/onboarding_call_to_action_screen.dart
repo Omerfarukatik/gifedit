@@ -216,7 +216,7 @@ class OnboardingCallToActionScreen extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0), // Kenarlara biraz boşluk verelim
                       child: Image.asset(
-                        'assets/pictures/gem3.png', // GÖRSEL YOLU
+                        'assets/pictures/s3.png', // GÖRSEL YOLU
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return Icon(Icons.celebration_outlined,

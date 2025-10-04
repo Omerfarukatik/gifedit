@@ -144,7 +144,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get subscriptionManagement => 'Abonelik Yönetimi';
 
   @override
-  String get currentPlanTitle => 'Mevcut Planınız: Stitch PRO';
+  String get currentPlanTitle => 'Mevcut Planınız: ATİK PRO';
 
   @override
   String get nextRenewalDate => 'Bir sonraki yenileme tarihi:';
@@ -370,4 +370,10 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get english => 'İngilizce';
+
+  @override
+  String get permissionPermanentlyDenied => 'İzin kalıcı olarak reddedildi. Lütfen uygulama ayarlarından izin verin.';
+
+  @override
+  String get settings => 'AYARLAR';
 }

@@ -48,7 +48,7 @@
   "createGif": "Create GIF",
 
   "subscriptionManagement": "Subscription Management",
-  "currentPlanTitle": "Your Current Plan: Stitch PRO",
+  "currentPlanTitle": "Your Current Plan: ATİK PRO",
   "nextRenewalDate": "Next renewal date:",
   "proBenefitsListTitle": "Your PRO Benefits:",
   "proFeature1": "No watermarks",
@@ -131,5 +131,8 @@
 
   "gallery": "Gallery",
   "turkish": "Turkish",
-  "english": "English"
+  "english": "English",
+
+  "permissionPermanentlyDenied": "Permission permanently denied. Please grant it from the app settings.",
+  "settings": "SETTINGS"
 }

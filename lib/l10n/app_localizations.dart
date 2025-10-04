@@ -368,7 +368,7 @@ abstract class AppLocalizations {
   /// No description provided for @currentPlanTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Current Plan: Stitch PRO'**
+  /// **'Your Current Plan: ATİK PRO'**
   String get currentPlanTitle;
 
   /// No description provided for @nextRenewalDate.
@@ -820,6 +820,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get english;
+
+  /// No description provided for @permissionPermanentlyDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission permanently denied. Please grant it from the app settings.'**
+  String get permissionPermanentlyDenied;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'SETTINGS'**
+  String get settings;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

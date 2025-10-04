@@ -338,8 +338,12 @@ class _ThemeSettingsWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final theme = Theme.of(context);
-    final currentMode = themeProvider.themeMode;
-    final isDark = currentMode == ThemeMode.dark;
+
+    // --- HATA DÜZELTMESİ ---
+    // Anahtarın durumunu, provider'daki ayardan değil, uygulamanın o anki gerçek parlaklığından alıyoruz.
+    // Bu, 'ThemeMode.system' seçiliyken bile doğru durumu göstermesini sağlar.
+    final isDark = theme.brightness == Brightness.dark;
+
     final primaryTextColor = theme.textTheme.bodyMedium!.color;
     final secondaryTextColor = theme.hintColor;
 
