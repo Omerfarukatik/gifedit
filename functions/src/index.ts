@@ -160,9 +160,12 @@ export const createGif = onRequest(
          });
 
                         // İŞTE BU! VERİTABANINA KAYDEDECEĞİMİZ ASIL URL!
-         const finalPermanentUrl = finalCloudinaryResult.secure_url;
-         logger.info(`KALICI URL oluşturuldu: ${finalPermanentUrl}`);
-
+         const rawPermanentUrl = finalCloudinaryResult.secure_url;
+         logger.info(`KALICI URL oluşturuldu: ${rawPermanentUrl}`);
+        const finalPermanentUrl = rawPermanentUrl.replace(
+          "/image/upload/",
+          "/image/upload/q_auto,f_auto/"
+        );
         logger.info("Firestore'a kayıt işlemi başlıyor...");
         const userRef = db.collection('users').doc(userId);
         const userDoc = await userRef.get(); // transaction dışında okuma
@@ -181,7 +184,7 @@ export const createGif = onRequest(
             gifUrl: finalPermanentUrl,
             creatorId: userId,
             creatorUsername: userDoc.data()?.username || 'bilinmiyor',
-            creatorProfileUrl: userDoc.data()?.avatar_url || '',
+            creatorProfileUrl: userDoc.data()?.avatarUrl || '',
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             saves: 0,
             likes: 0,
@@ -197,7 +200,7 @@ export const createGif = onRequest(
             gifUrl: finalPermanentUrl,
             creatorId: userId,
             creatorUsername: userDoc.data()?.username || 'bilinmiyor', // <<< EKLENDİ
-            creatorProfileUrl: userDoc.data()?.avatar_url || '',      // <<< EKLENDİ
+            creatorProfileUrl: userDoc.data()?.avatarUrl || '',      // <<< EKLENDİ
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             saves: 0, // Bu bilgileri de eklemek tutarlılık için iyidir.
             likes: 0, // Bu bilgileri de eklemek tutarlılık için iyidir.
