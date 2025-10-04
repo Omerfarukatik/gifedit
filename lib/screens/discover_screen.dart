@@ -131,6 +131,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                             isProcessingSave: profileProvider.isProcessingSave(gifId),
                             onLikePressed: () => profileProviderForActions.toggleLikeGif(gifId),
                             onSavePressed: () => profileProviderForActions.toggleSaveGif(gifData),
+                            // --- YENİ: Sadece indirme butonu görünsün ---
+                            showLikeButton: false,
+                            showSaveButton: false,
+                            // --- YENİ: Tıklayınca resmi büyüt ---
+                            openInDialogOnClick: true,
                             isDownloading: _downloadingGifId == gifId, // Bu kartın indirilip indirilmediğini kontrol et
                             onDownloadPressed: () async {
                               if (imageUrl.isNotEmpty && _downloadingGifId == null) {
