@@ -25,8 +25,8 @@ class MemePostCard extends StatelessWidget {
   final bool isProcessingSave;
   final VoidCallback onLikePressed;
   final VoidCallback onSavePressed;
-  // TODO: Download fonksiyonu için bir callback ekle.
-  // final VoidCallback onDownloadPressed;
+  final VoidCallback onDownloadPressed;
+  final bool isDownloading; // İndirme durumunu takip etmek için yeni parametre
 
   const MemePostCard({
     super.key,
@@ -38,7 +38,8 @@ class MemePostCard extends StatelessWidget {
     required this.isProcessingSave,
     required this.onLikePressed,
     required this.onSavePressed,
-    // required this.onDownloadPressed,
+    required this.onDownloadPressed,
+    required this.isDownloading,
   });
 
   @override
@@ -182,12 +183,22 @@ class MemePostCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 16),
                       // BUTON REVİZYONU: YENİ İNDİRME BUTONU
-                      _buildActionButton(
-                        context,
-                        icon: Icons.download_outlined,
-                        label: "İNDİR",
-                        onPressed: () { /* TODO: İndirme fonksiyonu */ },
-                      ),
+                      // İndirme durumuna göre ya butonu ya da spinner'ı göster
+                      isDownloading
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0), // Butonla aynı hizada olması için
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2.5),
+                              ),
+                            )
+                          : _buildActionButton(
+                              context,
+                              icon: Icons.download_outlined,
+                              label: l10n.download,
+                              onPressed: onDownloadPressed,
+                            ),
                       const Spacer(),
                       // Kaydetme butonu
                       _buildActionButton(
@@ -254,4 +265,3 @@ class MemePostCard extends StatelessWidget {
     );
   }
 }
-

@@ -144,7 +144,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get subscriptionManagement => 'Abonelik Yönetimi';
 
   @override
-  String get currentPlanTitle => 'Mevcut Planınız: Stitch PRO';
+  String get currentPlanTitle => 'Mevcut Planınız: ATİK PRO';
 
   @override
   String get nextRenewalDate => 'Bir sonraki yenileme tarihi:';
@@ -172,9 +172,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get appearanceSettings => 'Görünüm Ayarları';
-
-  @override
-  String get darkMode => 'Koyu Tema (Dark Mode)';
 
   @override
   String get customThemeDisabled => 'Özel tema devre dışı';
@@ -307,4 +304,76 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get unknownDate => 'Bilinmeyen Tarih';
+
+  @override
+  String get usernameHint => 'Kullanıcı Adı';
+
+  @override
+  String get download => 'İndir';
+
+  @override
+  String get share => 'Paylaş';
+
+  @override
+  String get permissionRequiredForGallery => 'Galeriye kaydetmek için izin vermelisiniz.';
+
+  @override
+  String get gifSavedToGallery => 'GIF galeriye kaydedildi!';
+
+  @override
+  String get failedToSaveGif => 'GIF galeriye kaydedilemedi.';
+
+  @override
+  String get failedToDownloadGif => 'GIF indirilemedi.';
+
+  @override
+  String get newest => 'En Yeniler';
+
+  @override
+  String get popular => 'Popüler';
+
+  @override
+  String get trending => 'Trendler';
+
+  @override
+  String get editProfile => 'Profili Düzenle';
+
+  @override
+  String get changeProfilePicture => 'Fotoğrafı Değiştir';
+
+  @override
+  String get snackbarsuccesedprofileupdate => 'Profil başarıyla güncellendi.';
+
+  @override
+  String get snackbarfailedtoprofileupdate => 'Profil güncellenemedi.';
+
+  @override
+  String get areyousuretoexit => 'Uygulamadan çıkmak istediğinize emin misiniz?';
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String get darkMode => 'Koyu Tema';
+
+  @override
+  String get lightMode => 'Açık Tema)';
+
+  @override
+  String get languageSettings => 'Dil Ayarları';
+
+  @override
+  String get gallery => 'Galeri';
+
+  @override
+  String get turkish => 'Türkçe';
+
+  @override
+  String get english => 'İngilizce';
+
+  @override
+  String get permissionPermanentlyDenied => 'İzin kalıcı olarak reddedildi. Lütfen uygulama ayarlarından izin verin.';
+
+  @override
+  String get settings => 'AYARLAR';
 }

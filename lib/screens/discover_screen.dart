@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/profile_provider.dart';
+import 'package:memecreat/services/download_service.dart'; // İndirme servisini import et
 import 'package:memecreat/services/meme_post_card.dart';
 import 'package:memecreat/theme/app_theme.dart';
 import 'package:provider/provider.dart';
@@ -17,12 +18,16 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen>
     with AutomaticKeepAliveClientMixin {
 
+  // Hangi GIF'in indirildiğini takip etmek için state değişkeni
+  String? _downloadingGifId;
+
+  final DownloadService _downloadService = DownloadService(); // Servis'ten bir nesne oluştur
+
   @override
   bool get wantKeepAlive => true; // ← SCROLL POZİSYONUNU KORUR
 
   Widget _buildFilterChip(BuildContext context, String label, {bool isSelected = false}) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ActionChip(
@@ -69,9 +74,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                 scrollDirection: Axis.horizontal,
                 children: [
                   _buildFilterChip(context, l10n.all, isSelected: true),
-                  _buildFilterChip(context, "Popular"),
-                  _buildFilterChip(context, "Newest"),
-                  _buildFilterChip(context, "Trending"),
+                  _buildFilterChip(context, l10n.popular),
+                  _buildFilterChip(context, l10n.newest),
+                  _buildFilterChip(context, l10n.trending),
                 ],
               ),
             ),
@@ -109,6 +114,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                     final isLiked = (currentUserId != null)
                         ? likedByList.contains(currentUserId)
                         : false;
+                    final imageUrl = gifData['gifUrl'] as String? ?? '';
 
                     // ← CONSUMER'I BURAYA TAŞI, SADECE BU CARD İÇİN
                     return Consumer<ProfileProvider>(
@@ -125,6 +131,20 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                             isProcessingSave: profileProvider.isProcessingSave(gifId),
                             onLikePressed: () => profileProviderForActions.toggleLikeGif(gifId),
                             onSavePressed: () => profileProviderForActions.toggleSaveGif(gifData),
+                            isDownloading: _downloadingGifId == gifId, // Bu kartın indirilip indirilmediğini kontrol et
+                            onDownloadPressed: () async {
+                              if (imageUrl.isNotEmpty && _downloadingGifId == null) {
+                                setState(() => _downloadingGifId = gifId); // İndirmeyi başlat
+                                try {
+                                  await _downloadService.saveGifToGallery(context, imageUrl);
+                                } finally {
+                                  // İşlem bitince (hata olsa bile) spinner'ı kaldır
+                                  if (mounted) {
+                                    setState(() => _downloadingGifId = null);
+                                  }
+                                }
+                              }
+                            },
                           ),
                         );
                       },

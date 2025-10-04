@@ -221,7 +221,7 @@ class OnboardingFeaturesScreen extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.asset(
-                            'assets/pictures/gem22.png', // GÖRSEL YOLU
+                            'assets/pictures/s2.png', // GÖRSEL YOLU
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(

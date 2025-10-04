@@ -103,10 +103,10 @@ Future<void> _showLogoutConfirmationDialog(BuildContext context) async {
     builder: (BuildContext dialogContext) {
       return AlertDialog(
         title: Text(l10n.logOut),
-        content: const Text("Çıkış yapmak istediğinizden emin misiniz?"), // TODO: Yerelleştir
+        content:  Text(l10n.areyousuretoexit), // TODO: Yerelleştir
         actions: <Widget>[
           TextButton(
-            child: const Text("Vazgeç"), // TODO: Yerelleştir
+            child:  Text(l10n.cancel), // TODO: Yerelleştir
             onPressed: () {
               Navigator.of(dialogContext).pop(); // Sadece diyaloğu kapat
             },
@@ -155,15 +155,15 @@ class _LanguageSettingsWidget extends StatelessWidget {
 
     return ExpansionTile(
       leading: const Icon(Icons.language_outlined, size: 28),
-      title: const Text(
-        "Dil Ayarları", // TODO: Yerelleştir
+      title:  Text(
+        l10n.languageSettings, 
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
-      initiallyExpanded: false,
+      initiallyExpanded: true,
       childrenPadding: const EdgeInsets.symmetric(horizontal: 16.0),
       children: [
         RadioListTile<String>(
-          title: const Text('Türkçe'),
+          title:  Text(l10n.turkish),
           value: 'tr',
           groupValue: currentLocale.languageCode,
           onChanged: (value) {
@@ -173,7 +173,7 @@ class _LanguageSettingsWidget extends StatelessWidget {
           },
         ),
         RadioListTile<String>(
-          title: const Text('English'),
+          title:  Text(l10n.english),
           value: 'en',
           groupValue: currentLocale.languageCode,
           onChanged: (value) {
@@ -195,8 +195,6 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final secondaryTextColor = theme.hintColor;
-
     // Verileri Map'ten al
     final username = userData['username'] ?? l10n.username;
     final avatarUrl = userData['avatarUrl'] as String?; // 'avatar_url' -> 'avatarUrl' olarak düzeltildi
@@ -246,7 +244,7 @@ class _ProfileHeader extends StatelessWidget {
                 ),
               );
             },
-            child: const Text("Profili Düzenle"), // TODO: Yerelleştir
+            child:  Text(l10n.editProfile), 
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: theme.hintColor),
             ),
@@ -316,7 +314,7 @@ class _SubscriptionSettingsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    l10n.currentPlanTitle, // "Mevcut Planınız: Stitch PRO"
+                    l10n.currentPlanTitle, // "Mevcut Planınız:"
                     style: TextStyle(color: theme.hintColor, fontSize: 14),
                   ),
                 ],
@@ -340,9 +338,12 @@ class _ThemeSettingsWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final theme = Theme.of(context);
-    final currentMode = themeProvider.themeMode;
-    final isSystem = currentMode == ThemeMode.system;
-    final isDark = currentMode == ThemeMode.dark;
+
+    // --- HATA DÜZELTMESİ ---
+    // Anahtarın durumunu, provider'daki ayardan değil, uygulamanın o anki gerçek parlaklığından alıyoruz.
+    // Bu, 'ThemeMode.system' seçiliyken bile doğru durumu göstermesini sağlar.
+    final isDark = theme.brightness == Brightness.dark;
+
     final primaryTextColor = theme.textTheme.bodyMedium!.color;
     final secondaryTextColor = theme.hintColor;
 
@@ -365,7 +366,7 @@ class _ThemeSettingsWidget extends StatelessWidget {
               style: TextStyle(color: primaryTextColor),
             ),
             subtitle: Text(
-              isDark ? "Koyu mod aktif" : "Açık mod aktif", // TODO: Yerelleştir
+              isDark ? l10n.darkMode : l10n.lightMode, 
               style: TextStyle(color: secondaryTextColor),
             ),
             value: isDark,
