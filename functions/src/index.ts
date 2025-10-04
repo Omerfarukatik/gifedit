@@ -181,7 +181,7 @@ export const createGif = onRequest(
             gifUrl: finalPermanentUrl,
             creatorId: userId,
             creatorUsername: userDoc.data()?.username || 'bilinmiyor',
-            creatorProfileUrl: userDoc.data()?.avatar_url || '',
+            creatorProfileUrl: userDoc.data()?.avatarUrl || '',
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             saves: 0,
             likes: 0,
@@ -197,7 +197,7 @@ export const createGif = onRequest(
             gifUrl: finalPermanentUrl,
             creatorId: userId,
             creatorUsername: userDoc.data()?.username || 'bilinmiyor', // <<< EKLENDİ
-            creatorProfileUrl: userDoc.data()?.avatar_url || '',      // <<< EKLENDİ
+            creatorProfileUrl: userDoc.data()?.avatarUrl || '',      // <<< GÜNCELLENDİ
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             saves: 0, // Bu bilgileri de eklemek tutarlılık için iyidir.
             likes: 0, // Bu bilgileri de eklemek tutarlılık için iyidir.

@@ -10,6 +10,7 @@ import 'package:memecreat/providers/auth_provider.dart';
 import 'package:memecreat/screens/login.dart';
 import 'package:memecreat/screens/edit_profile_screen.dart';
 import 'package:memecreat/providers/localization_provider.dart';
+import 'package:memecreat/screens/all_content_screen.dart'; // <<< YENİ: Galeri ekranını import ediyoruz
 
 // Ekran artık `StatelessWidget`, çünkü durumu Provider yönetiyor.
 class ProfileScreen extends StatelessWidget {
@@ -70,7 +71,6 @@ class ProfileScreen extends StatelessWidget {
                     _ProfileHeader(userData: userData),
 
                     const Divider(height: 1),
-
                     // 2. ABONELİK AYARLARI KARTI
                     const _SubscriptionSettingsCard(),
                     const Divider(height: 1),
@@ -88,6 +88,45 @@ class ProfileScreen extends StatelessWidget {
             ),
         );
       },
+    );
+  }
+
+  // "Oluşturduklarım" ve "Kaydettiklerim" için tıklanabilir satır oluşturan widget.
+  Widget _buildContentLink(BuildContext context,
+      {required IconData icon, required String title, required int count}) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: () {
+        // Tıklandığında ilgili içerik listesini gösteren sayfaya git.
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AllContentScreen(contentType: title),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: Row(
+          children: [
+            Icon(icon, size: 28),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            Text(
+              count.toString(),
+              style: TextStyle(color: theme.hintColor, fontSize: 16),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_ios, size: 16),
+          ],
+        ),
+      ),
     );
   }
 }

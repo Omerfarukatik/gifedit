@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
+import 'package:flutter/foundation.dart'; // debugPrint için eklendi
 import 'package:memecreat/providers/profile_provider.dart';
 import 'package:memecreat/services/download_service.dart'; // İndirme servisini import et
 import 'package:memecreat/services/meme_post_card.dart';
@@ -56,6 +57,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final profileProviderForActions = Provider.of<ProfileProvider>(context, listen: false);
+    debugPrint("[DiscoverScreen] Build metodu çalıştı.");
 
     return Scaffold(
       appBar: AppBar(
@@ -89,11 +91,19 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                   .orderBy('createdAt', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
+                // --- HATA KONTROLÜ ---
+                if (snapshot.hasError) {
+                  debugPrint("[DiscoverScreen] StreamBuilder HATA: ${snapshot.error}");
+                  return Center(child: Text("Veri yüklenirken bir hata oluştu: ${snapshot.error}"));
+                }
+
                 if (snapshot.connectionState == ConnectionState.waiting) {
+                  debugPrint("[DiscoverScreen] StreamBuilder veri bekliyor...");
                   return const Center(child: CircularProgressIndicator());
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  debugPrint("[DiscoverScreen] Stream'den veri gelmedi veya 'gifs' koleksiyonu boş.");
                   return Center(child: Text(l10n.gifNotFound));
                 }
 
@@ -101,41 +111,29 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
                 return ListView.builder(
                   key: const PageStorageKey<String>('discover_list'), // ← SCROLL POZİSYONU KAYDET
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 10.0),
                   itemCount: gifDocs.length,
                   itemBuilder: (context, index) {
                     final gifData = gifDocs[index].data();
                     final gifId = gifData['id'] as String? ?? '';
-                    if (gifId.isEmpty) return const SizedBox.shrink();
-
-                    final List<dynamic> likedByList = gifData['likedBy'] ?? [];
-                    final likeCount = likedByList.length;
-                    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-                    final isLiked = (currentUserId != null)
-                        ? likedByList.contains(currentUserId)
-                        : false;
+                    if (gifId.isEmpty) {
+                      debugPrint("[DiscoverScreen] UYARI: ID'si olmayan bir GIF dökümanı atlandı.");
+                      return const SizedBox.shrink();
+                    }
+                    
                     final imageUrl = gifData['gifUrl'] as String? ?? '';
 
                     // ← CONSUMER'I BURAYA TAŞI, SADECE BU CARD İÇİN
                     return Consumer<ProfileProvider>(
                       builder: (context, profileProvider, _) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 25.0),
+                        return Padding( // Kartlar arası dikey boşluk
+                          padding: const EdgeInsets.only(bottom: 16.0),
                           child: MemePostCard(
                             key: ValueKey(gifId),
                             gifData: gifData,
-                            likeCount: likeCount,
-                            isLiked: isLiked,
                             isSaved: profileProvider.isGifSaved(gifId),
-                            isProcessingLike: profileProvider.isProcessingLike(gifId),
                             isProcessingSave: profileProvider.isProcessingSave(gifId),
-                            onLikePressed: () => profileProviderForActions.toggleLikeGif(gifId),
                             onSavePressed: () => profileProviderForActions.toggleSaveGif(gifData),
-                            // --- YENİ: Sadece indirme butonu görünsün ---
-                            showLikeButton: false,
-                            showSaveButton: false,
-                            // --- YENİ: Tıklayınca resmi büyüt ---
-                            openInDialogOnClick: true,
                             isDownloading: _downloadingGifId == gifId, // Bu kartın indirilip indirilmediğini kontrol et
                             onDownloadPressed: () async {
                               if (imageUrl.isNotEmpty && _downloadingGifId == null) {

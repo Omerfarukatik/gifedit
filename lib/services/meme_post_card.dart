@@ -7,23 +7,11 @@ import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/screens/gif_detail_page.dart';
 import 'package:timeago/timeago.dart' as timeago; // ZAMAN FORMATI İÇİN EKLENDİ
 
-// Beğeni sayısını formatlayan yardımcı fonksiyon (Aynı kalıyor)
-String _formatLikes(int count) {
-  if (count < 0) return '0';
-  if (count < 1000) return count.toString();
-  if (count < 1000000) return '${(count / 1000.0).toStringAsFixed(1)}K';
-  return '${(count / 1000000.0).toStringAsFixed(1)}M';
-}
-
 // BU WIDGET PROVIDER'I BİLMEZ. SADECE VERİ ALIR VE FONKSİYON TETİKLER.
 class MemePostCard extends StatelessWidget {
   final Map<String, dynamic> gifData;
-  final int likeCount;
-  final bool isLiked;
   final bool isSaved;
-  final bool isProcessingLike;
   final bool isProcessingSave;
-  final VoidCallback onLikePressed;
   final VoidCallback onSavePressed;
   final VoidCallback onDownloadPressed;
   final bool isDownloading; // İndirme durumunu takip etmek için yeni parametre
@@ -31,12 +19,8 @@ class MemePostCard extends StatelessWidget {
   const MemePostCard({
     super.key,
     required this.gifData,
-    required this.likeCount,
-    required this.isLiked,
     required this.isSaved,
-    required this.isProcessingLike,
     required this.isProcessingSave,
-    required this.onLikePressed,
     required this.onSavePressed,
     required this.onDownloadPressed,
     required this.isDownloading,
@@ -60,19 +44,11 @@ class MemePostCard extends StatelessWidget {
 
 
     return Container(
-      // ESTETİK DEVRİM 1: Kartın etrafına zarif bir gölge eklendi.
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      // DEĞİŞİKLİK: Gölge kaldırıldı ve margin ayarlandı.
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16.0),
-        boxShadow: [
-          BoxShadow(
-            color: isDark ? Colors.black.withOpacity(0.4) : Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       // Bütün içeriği, taşmaları önlemek ve köşeleri yuvarlatmak için ClipRRect içine alıyoruz.
       child: ClipRRect(
@@ -115,11 +91,11 @@ class MemePostCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // "More" butonu biraz daha az yer kaplayabilir.
+                    // DEĞİŞİKLİK: Kaydet butonu buradan kaldırıldı, yerine "Daha Fazla" menüsü geldi.
                     IconButton(
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () { /* Diğer seçenekler menüsü */ },
-                        icon: const Icon(Icons.more_horiz)
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () { /* Diğer seçenekler menüsü */ },
+                      icon: const Icon(Icons.more_horiz),
                     ),
                   ],
                 ),
@@ -133,34 +109,31 @@ class MemePostCard extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => GifDetailPage(
+                      gifData: gifData, // <<< YENİ: Tüm veriyi detay sayfasına gönderiyoruz.
                       gifUrl: imageUrl,
                       userName: username,
                       userProfileImageUrl: userAvatarUrl ?? '',
                       description: caption,
-                      postDate: postDate?.toString().substring(0, 10) ?? l10n.unknownDate,
-                      likeCount: likeCount,
-                      isLiked: isLiked,
+                      postDate: timeAgoString, // Detay sayfasında da "5 dakika önce" gibi görünsün.
                     ),
                   ),
                 );
               },
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                placeholder: (context, url) => AspectRatio(
-                  aspectRatio: 4 / 3,
-                  child: Container(
-                    color: isDark ? Colors.grey[800] : Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
-                  ),
-                ),
-                errorWidget: (context, url, error) => AspectRatio(
-                  aspectRatio: 4 / 3,
-                  child: Container(
-                    color: isDark ? Colors.grey[800] : Colors.grey[200],
-                    child: const Icon(Icons.broken_image),
-                  ),
+              // DEĞİŞİKLİK: GIF'lerin farklı boyutlarda olmasını engellemek için AspectRatio kullanıyoruz.
+              child: AspectRatio(
+                aspectRatio: 4 / 3, // Tüm kartların aynı oranda olmasını sağlar.
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover, // Görüntünün alanı doldurmasını sağlar.
+                  width: double.infinity,
+                  placeholder: (context, url) => Container(
+                      color: isDark ? Colors.grey[800] : Colors.grey[200],
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
+                    ),
+                  errorWidget: (context, url, error) => Container(
+                      color: isDark ? Colors.grey[800] : Colors.grey[200],
+                      child: const Icon(Icons.broken_image),
+                    ),
                 ),
               ),
             ),
@@ -173,15 +146,6 @@ class MemePostCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      // Beğeni butonu ve sayısı bir arada, daha kompakt.
-                      _buildActionButton(
-                        context,
-                        icon: isLiked ? Icons.favorite : Icons.favorite_border,
-                        label: _formatLikes(likeCount),
-                        color: isLiked ? Colors.redAccent : theme.iconTheme.color,
-                        onPressed: isProcessingLike ? null : onLikePressed,
-                      ),
-                      const SizedBox(width: 16),
                       // BUTON REVİZYONU: YENİ İNDİRME BUTONU
                       // İndirme durumuna göre ya butonu ya da spinner'ı göster
                       isDownloading
@@ -200,12 +164,13 @@ class MemePostCard extends StatelessWidget {
                               onPressed: onDownloadPressed,
                             ),
                       const Spacer(),
-                      // Kaydetme butonu
+                      // DEĞİŞİKLİK: Kaydetme butonu tekrar buraya eklendi.
                       _buildActionButton(
                         context,
                         icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
                         color: isSaved ? theme.colorScheme.primary : theme.iconTheme.color,
                         onPressed: isProcessingSave ? null : onSavePressed,
+                        // Butonun etrafındaki tıklama alanını genişletmek için label'sız versiyon
                       ),
                     ],
                   ),
