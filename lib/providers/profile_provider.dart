@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:memecreat/services/download_service.dart';
 import 'package:memecreat/services/storage_service.dart';
 import 'package:memecreat/services/user_repository.dart';
 
@@ -29,7 +28,6 @@ class ProfileProvider with ChangeNotifier {
   final StorageService _storageService = StorageService(); // EKLENDİ
   final UserRepository _userRepository = UserRepository(); // EKLENDİ
   final Set<String> _processingLikes = {}; // EKSİK PARÇA
-  final Set<String> _processingDownloads = {}; // İndirme işlemleri için kilit
   final Set<String> _processingSaves = {}; // Kaydetme işlemi için kilit
 
   // --- GETTER'LAR (ARAYÜZÜN VERİYE ULAŞIM NOKTALARI) ---
@@ -112,8 +110,6 @@ class ProfileProvider with ChangeNotifier {
   bool isProcessingSave(String gifId) => _processingSaves.contains(gifId);
 
   bool isProcessingLike(String gifId) => _processingLikes.contains(gifId);
-
-  bool isDownloading(String gifId) => _processingDownloads.contains(gifId);
 
   // --- AKSİYONLAR (BUTONLARIN ÇAĞIRDIĞI FONKSİYONLAR) ---
 
@@ -237,32 +233,6 @@ class ProfileProvider with ChangeNotifier {
     }
   }
 
-  /// Bir GIF'i indirir ve indirme durumu boyunca arayüzü günceller.
-  Future<void> downloadGif(BuildContext context, Map<String, dynamic> gifData) async {
-    // DownloadService'i burada oluşturuyoruz.
-    // Provider'a bağımlı olmaması için bu daha temiz bir yöntem.
-    final downloadService = DownloadService();
-
-    final gifId = gifData['id'] as String?;
-    final gifUrl = gifData['gifUrl'] as String?;
-
-    if (gifId == null || gifUrl == null || isDownloading(gifId)) return;
-
-    _processingDownloads.add(gifId);
-    notifyListeners(); // İndirme göstergesini başlatmak için UI'yı güncelle
-
-    try {
-      // Servis metodunu çağır. Context'i geçerek SnackBar'ların gösterilmesini sağla.
-      await downloadService.saveGifToGallery(context, gifUrl);
-    } catch (e) {
-      // Hata yönetimi zaten servis içinde yapılıyor (SnackBar gösterimi vb.)
-      // Burada sadece loglama yapabiliriz.
-      debugPrint("downloadGif provider metodunda hata yakalandı: $e");
-    } finally {
-      _processingDownloads.remove(gifId);
-      notifyListeners(); // İndirme göstergesini kaldırmak için UI'yı güncelle
-    }
-  }
 
   Future<void> refreshData() async {
     final user = _auth.currentUser;
@@ -293,7 +263,6 @@ class ProfileProvider with ChangeNotifier {
     _createdGifs = [];
     _savedGifs = [];
     _processingLikes.clear();
-    _processingDownloads.clear();
     _processingSaves.clear();
     _error = null;
 
