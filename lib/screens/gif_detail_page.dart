@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memecreat/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // <<<<<<< BU SATIRI EKLE
 
 // Sayfa artık state'i (kaydetme durumu) yöneteceği için StatefulWidget'a dönüştü.
 class GifDetailPage extends StatelessWidget {
@@ -50,27 +51,24 @@ class GifDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. GIF GÖSTERİM ALANI
-            Image.network(
-              gifUrl,
+            CachedNetworkImage(
+              imageUrl: gifUrl,
               width: double.infinity,
               fit: BoxFit.cover,
               // Yüklenirken gösterilecek animasyon
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return AspectRatio(
-                  aspectRatio: 16 / 9, // GIF yüklenene kadar sabit bir oran tutar
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary, // Tema vurgu rengin
-                    ),
+              placeholder: (context, url) => AspectRatio(
+                aspectRatio: 16 / 9, // GIF yüklenene kadar sabit bir oran tutar
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary, // Tema vurgu rengin
                   ),
-                );
-              },
+                ),
+              ),
               // Hata durumunda gösterilecek widget
-              errorBuilder: (context, error, stackTrace) {
+              errorWidget: (context, url, error) {
                 // Hata ayıklama için konsola detaylı bilgi yazdır.
                 debugPrint('--- GIF YÜKLENİRKEN HATA (GifDetailPage) ---');
-                debugPrint('URL: $gifUrl');
+                debugPrint('URL: $url'); // 'url' parametresini kullan
                 debugPrint('Hata: $error');
                 debugPrint('------------------------------------------');
 
