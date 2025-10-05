@@ -63,19 +63,19 @@ const callFalAI = async (faceUrl: string, gifUrl: string): Promise<any> => {
 
 
 // --- ANA CLOUD FUNCTION (SENİN KODUN + VERİTABANI) ---
+// SENİN MEVCUT export const createGif ... BLOĞUNU SİL VE YERİNE BUNU YAPIŞTIR.
+
 export const createGif = onRequest(
-  // Secret Manager falan yok, her şey eskisi gibi.
+  // Ayarların aynı, dokunulmadı.
   { region: "europe-west1", memory: "1GiB", timeoutSeconds: 300 },
   async (request, response) => {
-
+    // Cloudinary config ve CORS ayarların aynı.
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
       api_key: process.env.CLOUDINARY_API_KEY,
       api_secret: process.env.CLOUDINARY_API_SECRET,
       secure: true,
     });
-
-    // CORS ayarların aynı, dokunmadım.
     response.set("Access-Control-Allow-Origin", "*");
     if (request.method === "OPTIONS") {
       response.set("Access-Control-Allow-Methods", "POST");
@@ -85,18 +85,12 @@ export const createGif = onRequest(
       return;
     }
 
+    // Busboy kullanımın aynı.
     const busboy = Busboy({ headers: request.headers });
     const tmpdir = os.tmpdir();
     const uploads: { [key: string]: string } = {};
     const fields: { [key: string]: string } = {};
     const fileWrites: Promise<void>[] = [];
-
-    // ###############################################################
-    // #           YENİ: İsteği yapan kullanıcı ID'sini alıyoruz          #
-    // ###############################################################
-    // Flutter'dan 'userId' diye bir alan göndermeni bekleyeceğiz.
-    let userId: string | null = null;
-    // ###############################################################
 
     busboy.on("file", (fieldname, file, info) => {
         const filepath = path.join(tmpdir, `${fieldname}-${Date.now()}-${info.filename}`);
@@ -113,125 +107,136 @@ export const createGif = onRequest(
 
     busboy.on("field", (fieldname, val) => {
         fields[fieldname] = val;
-        // Gelen alan 'userId' ise, onu değişkene ata.
-        if (fieldname === 'userId') {
-            userId = val;
-        }
     });
 
     busboy.on("finish", async () => {
       await Promise.all(fileWrites);
       try {
-        // ###############################################################
-        // #           YENİ: userId var mı diye kontrol ediyoruz             #
-        // ###############################################################
+        const { userId, caption } = fields; // Caption'ı da alıyoruz
         if (!userId) {
-            throw new Error("İstek içinde 'userId' alanı bulunamadı. Veritabanı kaydı için bu zorunludur.");
+            throw new Error("İstek içinde 'userId' alanı bulunamadı.");
+        }
+        if (!uploads.face_image) {
+          throw new Error("Yüz resmi ('face_image') bulunamadı.");
         }
         logger.info(`İşlem yapılan kullanıcı: ${userId}`);
-        // ###############################################################
 
-        // --- Burası senin çalışan kodun, dokunulmadı ---
+        // --- Yüz resmini en başta bir kere yükleyelim ---
         const faceImageUrl = await uploadToCloudinary(uploads.face_image, "memecreat/faces");
-        let gifImageUrl: string;
 
-        if (uploads.user_gif) {
-          gifImageUrl = await uploadToCloudinary(uploads.user_gif, "memecreat/gifs");
-        } else if (fields.gif_template) {
-           const templateDoc = await db.collection('templates').doc(fields.gif_template).get();
-           if (templateDoc.exists) {
-               gifImageUrl = templateDoc.data()?.sourceUrl;
-               if (!gifImageUrl) throw new Error(`Template (${fields.gif_template}) 'sourceUrl' alanına sahip değil.`);
+        // ===========================================================================
+        // =              İŞTE İSTEDİĞİN DEĞİŞİKLİK BURADA BAŞLIYOR                  =
+        // ===========================================================================
+        let sourceGifUrl: string; // Bu, fal.ai'ye gönderilecek olan orijinal şablon URL'si olacak
+
+      if (uploads.user_gif) {
+        // Senaryo 1: Kullanıcı kendi GIF'ini yüklüyor.
+        logger.info(`Senaryo 1: Kullanıcı ${userId} kendi GIF'ini yüklüyor.`);
+        sourceGifUrl = await uploadToCloudinary(uploads.user_gif, "memecreat/gifs");
+
+      }else if (fields.gif_template) {
+         // Eğer gelen veri URL ise direkt kullan, ID ise Firestore'dan çek
+         const templateValue = fields.gif_template.trim();
+
+         if (templateValue.startsWith('http://') || templateValue.startsWith('https://')) {
+           // URL gelmiş, direkt kullan
+           logger.info(`Template URL kullanılıyor: ${templateValue}`);
+           sourceGifUrl = templateValue;
+         } else {
+           // ID gelmiş, Firestore'dan çek
+           const cleanTemplateId = templateValue.replace(/^\//, '');
+           logger.info(`Template ID kullanılıyor: ${cleanTemplateId}`);
+           const templateDoc = await db.collection('templates').doc(cleanTemplateId).get();
+           if (templateDoc.exists && templateDoc.data()?.sourceUrl) {
+             sourceGifUrl = templateDoc.data()?.sourceUrl;
            } else {
-               throw new Error(`Template bulunamadı: ${fields.gif_template}`);
+             throw new Error(`Template bulunamadı: ${cleanTemplateId}`);
            }
-        } else {
-          throw new Error("GIF dosyası veya şablonu belirtilmedi.");
-        }
+         }
 
-        const falResult = await callFalAI(faceImageUrl, gifImageUrl);
+      } else if (fields.gif_template_url) {
+        // Senaryo 3: Kullanıcı mevcut bir GIF'i yeniden kullanıyor (Remix).
+        logger.info(`Senaryo 3: Kullanıcı ${userId} bir URL'yi remixliyor: ${fields.gif_template_url}`);
+        sourceGifUrl = fields.gif_template_url;
+
+      } else {
+        // Hiçbir kaynak belirtilmemişse hata ver.
+        throw new Error("GIF kaynağı belirtilmedi (user_gif, gif_template veya gif_template_url).");
+      }
+        // ===========================================================================
+        // =                  DEĞİŞİKLİK BURADA BİTİYOR                              =
+        // ===========================================================================
+
+        // Artık 'gifImageUrl' yerine hep 'sourceGifUrl' kullanıyoruz.
+        const falResult = await callFalAI(faceImageUrl, sourceGifUrl);
         const temporaryFalUrl = falResult.image.url as string;
-         logger.info(`fal.ai'den geçici URL alındı: ${temporaryFalUrl}`);
-         logger.info("Bu geçici URL, şimdi kalıcı hale getirilmek üzere Cloudinary'ye YENİDEN yüklenecek...");
-               // ADIM 4 & 5: Geçici fal.ai URL'sindeki resmi bizim Cloudinary'ye yükle
-         const finalCloudinaryResult = await cloudinary.uploader.upload(temporaryFalUrl, {
-               folder: "memecreat/results", // Sonuçları ayrı bir klasörde tutalım
-               resource_type: "auto",
-         });
+        logger.info(`fal.ai'den geçici URL alındı: ${temporaryFalUrl}`);
 
-                        // İŞTE BU! VERİTABANINA KAYDEDECEĞİMİZ ASIL URL!
+        // Sonucu Cloudinary'ye yükleme ve optimize etme (q_auto,f_auto)
+        const finalCloudinaryResult = await cloudinary.uploader.upload(temporaryFalUrl, {
+               folder: "memecreat/results",
+               resource_type: "auto",
+               format: 'gif', // .gif uzantısını garantilemek için
+         });
          const rawPermanentUrl = finalCloudinaryResult.secure_url;
-         logger.info(`KALICI URL oluşturuldu: ${rawPermanentUrl}`);
-        const finalPermanentUrl = rawPermanentUrl.replace(
-          "/image/upload/",
-          "/image/upload/q_auto,f_auto/"
-        );
+         const finalOptimizedUrl = rawPermanentUrl.replace("/image/upload/", "/image/upload/q_auto,f_auto/"); // Optimizasyon
+         logger.info(`KALICI VE OPTİMİZE URL oluşturuldu: ${finalOptimizedUrl}`);
+
         logger.info("Firestore'a kayıt işlemi başlıyor...");
         const userRef = db.collection('users').doc(userId);
-        const userDoc = await userRef.get(); // transaction dışında okuma
+        const userDoc = await userRef.get();
 
         if (!userDoc.exists) throw new Error(`Kullanıcı bulunamadı: ${userId}`);
 
         const newGifRef = db.collection('gifs').doc();
         const newGifId = newGifRef.id;
-
-        // Yazma işlemlerini bir batch'te topla
         const batch = db.batch();
 
-        // A) Ana 'gifs' koleksiyonuna kaydet
-        batch.set(newGifRef, {
+        // Veritabanına kaydedilecek olan ortak veri objesi
+        const newGifData = {
             id: newGifId,
-            gifUrl: finalPermanentUrl,
+            gifUrl: finalOptimizedUrl, // Sonuç (remixlenmiş) GIF
+            templateImageUrl: sourceGifUrl, // <<<<<<<< İŞTE BU! HANGİ ŞABLONDAN YAPILDIĞI
             creatorId: userId,
             creatorUsername: userDoc.data()?.username || 'bilinmiyor',
-            creatorProfileUrl: userDoc.data()?.avatarUrl || '',
+            creatorProfileUrl: userDoc.data()?.avatarUrl || '', // SENİN KODUNDA "avatarUrl"
+            caption: caption || '', // Flutter'dan gelen caption
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             saves: 0,
             likes: 0,
-        });
+        };
 
-        // B) Kullanıcının 'createdGifs' alt koleksiyonuna kaydet
+        // A) Ana 'gifs' koleksiyonuna kaydet
+        batch.set(newGifRef, newGifData);
+
+        // B) Kullanıcının 'createdGifs' alt koleksiyonuna kaydet (SENİN MİMARİN)
         const userCreatedGifRef = userRef.collection('createdGifs').doc(newGifId);
+        batch.set(userCreatedGifRef, newGifData);
 
-        // Ana koleksiyona ne yazıyorsak, buraya da aynısını yazalım.
-        // Bu, uygulamadaki tutarlılığı sağlar ve hataları önler.
-        batch.set(userCreatedGifRef, {
-            id: newGifId, // <<< DOKÜMAN ID'SİNİ DE VERİNİN İÇİNE EKLİYORUZ
-            gifUrl: finalPermanentUrl,
-            creatorId: userId,
-            creatorUsername: userDoc.data()?.username || 'bilinmiyor', // <<< EKLENDİ
-            creatorProfileUrl: userDoc.data()?.avatarUrl || '',      // <<< EKLENDİ
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            saves: 0, // Bu bilgileri de eklemek tutarlılık için iyidir.
-            likes: 0, // Bu bilgileri de eklemek tutarlılık için iyidir.
-        });
-
-        // C) Kullanıcının stats'ını güncelle
+        // C) Kullanıcının stats'ını güncelle (SENİN MİMARİN)
         batch.update(userRef, {
             'stats.creationsCount': admin.firestore.FieldValue.increment(1)
         });
 
-        await batch.commit(); // Tüm işlemleri tek seferde yap
-        logger.info("Firestore'a kayıt başarıyla tamamlandı.");
-        // ###############################################################
+        await batch.commit();
+        logger.info(`Firestore'a kayıt başarıyla tamamlandı. Yeni GIF ID: ${newGifId}`);
 
-        // --- Sonuç gönderme, senin kodunla aynı, dokunulmadı ---
         response.status(200).send({
           success: true,
-          result_gif_url: finalPermanentUrl,
+          result_gif_url: finalOptimizedUrl,
         });
 
       } catch (error) {
-        // --- Hata yönetimi, senin kodunla aynı, dokunulmadı ---
         const errorMessage = error instanceof Error ? error.message : "Bilinmeyen sunucu hatası.";
-        logger.error("Fonksiyonun TRY bloğunda hata oluştu:", { error: errorMessage });
+        logger.error("Fonksiyonda kritik hata:", { error: errorMessage, stack: (error as Error).stack });
         response.status(500).send({ success: false, error: errorMessage });
       } finally {
-        // --- Dosya temizleme, senin kodunla aynı, dokunulmadı ---
         for (const file in uploads) {
-          if (fs.existsSync(uploads[file])) {
-            fs.unlinkSync(uploads[file]);
-          }
+          try {
+            if (fs.existsSync(uploads[file])) {
+              fs.unlinkSync(uploads[file]);
+            }
+          } catch(e) { logger.warn(`Geçici dosya silinemedi: ${uploads[file]}`)}
         }
       }
     });

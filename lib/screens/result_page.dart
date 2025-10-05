@@ -84,21 +84,7 @@ class ResultPage extends StatelessWidget {
 
               // === EYLEM BUTONLARI ===
 
-              // 1. UYGULAMA İÇİ PAYLAŞMA
-              ElevatedButton.icon(
-                icon: const Icon(Icons.public),
-                label: const Text('Toplulukla Paylaş'),
-                onPressed: () {
-                  // TODO: Firebase'e veya backend'e yükleyip "Feed"e ekleme fonksiyonu.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Eserin toplulukla paylaşıldı! (Yakında)')),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
+
 
               const SizedBox(height: 15),
 

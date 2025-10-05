@@ -376,4 +376,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get settings => 'AYARLAR';
+
+  @override
+  String get gifCreatedSuccessfully => 'GIF başarıyla oluşturuldu!';
+
+  @override
+  String get creating => 'Oluşturuluyor...';
+
+  @override
+  String get templateNotFound => 'Şablon bulunamadı.';
+
+  @override
+  String get useThisGif => 'Bu GIF\'i Kullan';
+
+  @override
+  String get congratulations => 'Tebrikler!';
+
+  @override
+  String get continueToDetails => 'Detaya Devam Et';
+
+  @override
+  String get makeNew => 'Yeni Oluştur';
+
+  @override
+  String get heresYourMasterpiece => 'Senin Eserin Burada';
 }

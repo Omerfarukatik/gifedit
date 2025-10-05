@@ -3,6 +3,9 @@ import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:memecreat/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'gif_detail_page.dart';
 import 'all_content_screen.dart';
 import 'gif_upload_screen.dart';
 import 'paywall.dart';
@@ -303,34 +306,54 @@ class HomeScreen extends StatelessWidget {
           final gifData = gifs[index];
           final gifUrl = gifData['gifUrl'] as String?;
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 15.0),
-            child: AspectRatio(
-              aspectRatio: 9 / 16, // Dikey bir oran
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    border: Border.all(
-                        color: AppColors.primary.withOpacity(0.5), width: 1),
+          // --- DEĞİŞİKLİK: Tıklama işlevselliği için GestureDetector eklendi ---
+          return GestureDetector(
+            onTap: () {
+              if (gifUrl == null) return;
+              // Detay sayfasına yönlendirme mantığı (diğer ekranlardaki gibi)
+              final username = gifData['creatorUsername'] ?? 'bilinmiyor';
+              final userAvatarUrl = gifData['creatorProfileUrl'] as String? ?? '';
+              final caption = gifData['caption'] as String? ?? '';
+              final postTimestamp = gifData['createdAt'] as Timestamp?;
+              final postDate = postTimestamp?.toDate();
+              final timeAgoString = postDate != null ? timeago.format(postDate, locale: Localizations.localeOf(context).languageCode) : '';
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GifDetailPage(
+                    gifData: gifData,
+                    gifUrl: gifUrl,
+                    userName: username,
+                    userProfileImageUrl: userAvatarUrl,
+                    description: caption,
+                    postDate: timeAgoString,
                   ),
-                  child: gifUrl != null
-                      ? CachedNetworkImage(
-                    key: ValueKey(gifUrl), // Animasyon ve yeniden çizim hatalarını önler
-                    imageUrl: gifUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                    errorWidget: (context, url, error) =>
-                    const Icon(Icons.error),
-                  )
-                      : Center(
-                    child: Text(
-                      l10n.gifNotFound,
-                      style: TextStyle(color: theme.hintColor),
-                      textAlign: TextAlign.center,
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 15.0),
+              child: AspectRatio(
+                aspectRatio: 9 / 16, // Dikey bir oran
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1),
                     ),
+                    child: gifUrl != null
+                        ? CachedNetworkImage(
+                            key: ValueKey(gifUrl),
+                            imageUrl: gifUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            errorWidget: (context, url, error) => const Icon(Icons.error),
+                          )
+                        : Center(
+                            child: Text(l10n.gifNotFound, style: TextStyle(color: theme.hintColor), textAlign: TextAlign.center),
+                          ),
                   ),
                 ),
               ),

@@ -3,6 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/profile_provider.dart';
+import 'package:memecreat/screens/gif_detail_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import 'package:provider/provider.dart';
 
 // Tema ve Renkler
@@ -100,15 +103,41 @@ class _GifGrid extends StatelessWidget {
         final gifData = gifs[index];
         final gifUrl = gifData['gifUrl'] as String?;
         if (gifUrl == null) return Container(color: Colors.red.shade100);
+        
+        // Tıklama işlevselliği için GestureDetector ekliyoruz.
+        return GestureDetector(
+          onTap: () {
+            // MemePostCard'daki gibi detay sayfasına yönlendirme yapıyoruz.
+            final username = gifData['creatorUsername'] ?? 'bilinmiyor';
+            final userAvatarUrl = gifData['creatorProfileUrl'] as String? ?? '';
+            final caption = gifData['caption'] as String? ?? '';
+            final postTimestamp = gifData['createdAt'] as Timestamp?;
+            final postDate = postTimestamp?.toDate();
+            final timeAgoString = postDate != null ? timeago.format(postDate, locale: Localizations.localeOf(context).languageCode) : '';
 
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(4.0),
-          child: CachedNetworkImage(
-            key: ValueKey(gifUrl),
-            imageUrl: gifUrl,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(color: Theme.of(context).cardColor),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GifDetailPage(
+                  gifData: gifData,
+                  gifUrl: gifUrl,
+                  userName: username,
+                  userProfileImageUrl: userAvatarUrl,
+                  description: caption,
+                  postDate: timeAgoString,
+                ),
+              ),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4.0),
+            child: CachedNetworkImage(
+              key: ValueKey(gifUrl),
+              imageUrl: gifUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(color: Theme.of(context).cardColor),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
           ),
         );
       },
