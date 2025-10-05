@@ -832,6 +832,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SETTINGS'**
   String get settings;
+
+  /// No description provided for @gifCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'GIF created successfully!'**
+  String get gifCreatedSuccessfully;
+
+  /// No description provided for @creating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating...'**
+  String get creating;
+
+  /// No description provided for @templateNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Template not found.'**
+  String get templateNotFound;
+
+  /// No description provided for @useThisGif.
+  ///
+  /// In en, this message translates to:
+  /// **'Use This GIF'**
+  String get useThisGif;
+
+  /// No description provided for @congratulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations!'**
+  String get congratulations;
+
+  /// No description provided for @continueToDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Details'**
+  String get continueToDetails;
+
+  /// No description provided for @makeNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Make New'**
+  String get makeNew;
+
+  /// No description provided for @heresYourMasterpiece.
+  ///
+  /// In en, this message translates to:
+  /// **'Here\'s Your Masterpiece'**
+  String get heresYourMasterpiece;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

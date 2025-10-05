@@ -268,8 +268,6 @@ class _ProfileHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _StatColumn(label: l10n.gifStat, value: creationsCount),
-              _StatColumn(label: l10n.likeStat, value: totalLikes),
-              _StatColumn(label: l10n.followerStat, value: followerCount),
             ],
           ),
           const SizedBox(height: 20),

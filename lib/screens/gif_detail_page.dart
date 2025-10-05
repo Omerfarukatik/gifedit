@@ -1,12 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:memecreat/screens/gif_selection_screen.dart';
+import 'package:memecreat/l10n/app_localizations.dart';
 import 'package:memecreat/providers/profile_provider.dart';
+import 'package:memecreat/services/api_service.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart'; // <<<<<<< BU SATIRI EKLE
+import 'package:cached_network_image/cached_network_image.dart';
 
-// Sayfa artık state'i (kaydetme durumu) yöneteceği için StatefulWidget'a dönüştü.
-class GifDetailPage extends StatelessWidget {
-  // Kaydetme işlemi için tüm GIF verisine ihtiyacımız var.
+// Sayfa, Remix işlemi sırasında yükleme durumunu yöneteceği için StatefulWidget'a dönüştürüldü.
+class GifDetailPage extends StatefulWidget {
+  // Hem kaydetme hem de remix işlemi için tüm GIF verisine ihtiyacımız var.
   final Map<String, dynamic> gifData;
   final String gifUrl;
   final String userName;
@@ -25,54 +30,44 @@ class GifDetailPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // Provider'ları build metodu içinde tanımlıyoruz.
-    final profileProviderForActions = Provider.of<ProfileProvider>(context, listen: false);
-    final theme = Theme.of(context); // Temayı alıyoruz.
+  State<GifDetailPage> createState() => _GifDetailPageState();
+}
 
-    // Scaffold'un temel rengi temanızdan (AppTheme.darkTheme) otomatik olarak gelecektir.
+class _GifDetailPageState extends State<GifDetailPage> {
+  // Sadece bu sayfanın sorumluluğunda olan state değişkeni.
+  bool _isCreatingRemix = false;
+
+  // ApiService'in bir örneğini oluşturuyoruz.
+  // Daha gelişmiş bir yapıda bu, GetIt gibi bir DI (Dependency Injection) ile sağlanabilir.
+  final ApiService _apiService = ApiService();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        // AppTheme'deki appBarTheme ayarları sayesinde başlık ve ikon renkleri otomatik ayarlanır.
-        // Geri butonu Navigator.push ile gelindiği için otomatik eklenir.
         title: const Text("Gönderi"),
-        actions: [
-          // Gönderi sahibi ise silme veya düzenleme butonu gibi bir ikon eklenebilir.
-          IconButton(
-            icon: const Icon(Icons.more_horiz),
-            onPressed: () {
-              // Silme, düzenleme, bildirme gibi seçeneklerin olduğu bir menu göster.
-            },
-          ),
-        ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: _buildUseGifButton(context),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. GIF GÖSTERİM ALANI
             CachedNetworkImage(
-              imageUrl: gifUrl,
+              imageUrl: widget.gifUrl,
               width: double.infinity,
               fit: BoxFit.cover,
-              // Yüklenirken gösterilecek animasyon
               placeholder: (context, url) => AspectRatio(
-                aspectRatio: 16 / 9, // GIF yüklenene kadar sabit bir oran tutar
+                aspectRatio: 16 / 9,
                 child: const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary, // Tema vurgu rengin
-                  ),
+                  child: CircularProgressIndicator(color: AppColors.primary),
                 ),
               ),
-              // Hata durumunda gösterilecek widget
               errorWidget: (context, url, error) {
-                // Hata ayıklama için konsola detaylı bilgi yazdır.
-                debugPrint('--- GIF YÜKLENİRKEN HATA (GifDetailPage) ---');
-                debugPrint('URL: $url'); // 'url' parametresini kullan
-                debugPrint('Hata: $error');
-                debugPrint('------------------------------------------');
-
-                // Arayüzde kullanıcıya daha anlaşılır bir hata göster.
+                // Hata durumu için widget (senin kodundakiyle aynı)
                 return AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Container(
@@ -83,103 +78,140 @@ class GifDetailPage extends StatelessWidget {
                       children: [
                         Icon(Icons.broken_image_outlined, color: Colors.red, size: 48),
                         SizedBox(height: 16),
-                        Text(
-                          'GIF yüklenemedi.',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
+                        Text('GIF yüklenemedi.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
                 );
               },
             ),
-
             const SizedBox(height: 16),
-
             // 2. KULLANICI, AÇIKLAMA ve AKSİYONLAR
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // KULLANICI BİLGİSİ
                   _buildUserInfo(context),
-
                   const SizedBox(height: 16),
-
-                  // GÖNDERİ AÇIKLAMASI
-                  if (description.isNotEmpty)
+                  if (widget.description.isNotEmpty)
                     Text(
-                      description,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: 15,
-                        height: 1.4,
-                      ),
+                      widget.description,
+                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15, height: 1.4),
                     ),
-
-                  if (description.isNotEmpty)
-                    const SizedBox(height: 16),
-
-                  // GÖNDERİ TARİHİ
+                  if (widget.description.isNotEmpty) const SizedBox(height: 16),
                   Text(
-                    postDate,
+                    widget.postDate,
                     style: theme.textTheme.bodySmall,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32), // Sayfa sonuna boşluk
+            // FloatingActionButton'un içeriği kaplamaması için en alta boşluk ekleyelim.
+            const SizedBox(height: 100),
           ],
         ),
       ),
     );
   }
 
-  // Kullanıcı bilgisini gösteren özel bir widget
-  Widget _buildUserInfo(BuildContext context) {
-    // Provider'ı burada da alıyoruz ki butonu oluşturabilelim.
-    final profileProviderForActions = Provider.of<ProfileProvider>(context, listen: false);
-    final theme = Theme.of(context); // Temayı alıyoruz.
+  // --- Buton ve Remix Mantığı ---
 
-    // HATA DÜZELTMESİ: Profil fotoğrafı URL'sinin boş olup olmadığını kontrol et.
-    final bool hasProfileImage = userProfileImageUrl.isNotEmpty;
+  /// "Bu GIF'i Kullan" butonunu oluşturan widget.
+  Widget _buildUseGifButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    // Remix işlemi sürüyorsa, bir yükleme animasyonu göster.
+    if (_isCreatingRemix) {
+      return FloatingActionButton.extended(
+        onPressed: null, // Butonu pasif yap
+        label: Text(l10n.creating), // "Oluşturuluyor..."
+        icon: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+      );
+    }
+    // Normal durumdaki buton
+    return FloatingActionButton.extended(
+      onPressed: () => _useThisGifTemplate(context), // Tıklandığında ana mantığı çağır
+      label: Text(l10n.useThisGif), // "Bu GIF'i Kullan"
+      icon: const Icon(Icons.add_photo_alternate_outlined),
+    );
+  }
+
+  /// Butona tıklandığında çalışan ana Remix mantığı.
+  Future<void> _useThisGifTemplate(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+
+    // 1. Orijinal şablon URL'sini al.
+    final templateImageUrl = widget.gifData['templateImageUrl'] as String?;
+
+    if (templateImageUrl == null || templateImageUrl.isEmpty) {
+      messenger.showSnackBar(SnackBar(
+          content: Text(l10n.templateNotFound), backgroundColor: Colors.red));
+      return;
+    }
+
+    // 2. Galeriden YENİ yüz resmini seçtir.
+    final picker = ImagePicker();
+    final XFile? faceImageFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (faceImageFile == null) return; // Kullanıcı vazgeçti.
+
+    // 3. ApiService'i burada çağırmak yerine, kullanıcıyı sihirli bekleme
+    // ekranına yönlendiriyoruz. İşlemi o devralacak.
+    if (mounted) {
+      // ÖNEMLİ: GifSelectionScreen'ı import etmeyi unutma!
+      // Dosyanın başına şunu ekle: import 'package:memecreat/screens/gif_selection_screen.dart';
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => GifSelectionScreen(
+            userImage: File(faceImageFile.path), // Yeni seçilen yüz
+            startInLoadingMode: true, // <-- SİHİRLİ KOMUT 1
+            initialTemplateUrl:
+            templateImageUrl, // <-- SİHİRLİ KOMUT 2
+          ),
+        ),
+      );
+    }
+  }
+
+
+  // --- Yardımcı Widget'lar (Değişmedi) ---
+
+  /// Kullanıcı bilgisini ve kaydetme butonunu gösteren widget.
+  Widget _buildUserInfo(BuildContext context) {
+    final profileProviderForActions = Provider.of<ProfileProvider>(context, listen: false);
+    final theme = Theme.of(context);
+    final bool hasProfileImage = widget.userProfileImageUrl.isNotEmpty;
 
     return Row(
       children: [
         CircleAvatar(
           radius: 22,
-          // URL boş değilse resmi yükle, boşsa null ata.
-          backgroundImage: hasProfileImage ? NetworkImage(userProfileImageUrl) : null,
+          backgroundImage: hasProfileImage ? CachedNetworkImageProvider(widget.userProfileImageUrl) : null,
           backgroundColor: AppColors.backgroundDark.withOpacity(0.7),
-          // Eğer resim yoksa (backgroundImage null ise), varsayılan bir ikon göster.
-          child: !hasProfileImage
-              ? const Icon(Icons.person, size: 28, color: AppColors.secondaryContentColor)
-              : null,
+          child: !hasProfileImage ? const Icon(Icons.person, size: 28, color: AppColors.secondaryContentColor) : null,
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            userName,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            widget.userName,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
-        // DEĞİŞİKLİK: Kaydet butonu buraya taşındı.
+        // Kaydetme butonu, kendi state'ini ProfileProvider'dan dinlemeye devam ediyor.
         Consumer<ProfileProvider>(
           builder: (context, profileProvider, _) {
-            final gifId = gifData['id'] as String? ?? '';
+            final gifId = widget.gifData['id'] as String? ?? '';
             final isSaved = profileProvider.isGifSaved(gifId);
             final isProcessing = profileProvider.isProcessingSave(gifId);
 
             return _buildActionButton(
               context,
               icon: isSaved ? Icons.bookmark : Icons.bookmark_border,
-              // label'ı kaldırarak sadece ikon gösteriyoruz.
               color: isSaved ? AppColors.primary : null,
-              onPressed: isProcessing
-                  ? null
-                  : () => profileProviderForActions.toggleSaveGif(gifData),
+              onPressed: isProcessing ? null : () => profileProviderForActions.toggleSaveGif(widget.gifData),
             );
           },
         ),
@@ -187,30 +219,17 @@ class GifDetailPage extends StatelessWidget {
     );
   }
 
-  // MemePostCard'daki ile benzer bir buton oluşturma fonksiyonu.
-  Widget _buildActionButton(BuildContext context, {required IconData icon, String? label, Color? color, VoidCallback? onPressed}) {
+  /// Sadece kaydetme butonu için kullanılan küçük aksiyon butonu.
+  Widget _buildActionButton(BuildContext context, {required IconData icon, Color? color, VoidCallback? onPressed}) {
     final theme = Theme.of(context);
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min, // Row'un içeriği kadar yer kaplamasını sağlar.
-          children: [
-            // Eğer işlem devam ediyorsa (onPressed null ise) spinner göster.
-            onPressed == null
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5))
-                : Icon(icon, color: color ?? theme.iconTheme.color, size: 24),
-            if (label != null && label.isNotEmpty) ...[
-              const SizedBox(width: 12.0),
-              Text(
-                label,
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: color ?? theme.textTheme.bodyMedium?.color),
-              )
-            ],
-          ],
-        ),
+        padding: const EdgeInsets.all(8.0),
+        child: onPressed == null
+            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5))
+            : Icon(icon, color: color ?? theme.iconTheme.color, size: 28),
       ),
     );
   }

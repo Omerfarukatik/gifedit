@@ -134,5 +134,14 @@
   "english": "English",
 
   "permissionPermanentlyDenied": "Permission permanently denied. Please grant it from the app settings.",
-  "settings": "SETTINGS"
+  "settings": "SETTINGS",
+
+  "gifCreatedSuccessfully": "GIF created successfully!",
+  "creating": "Creating...",
+  "templateNotFound": "Template not found.",
+  "useThisGif": "Use This GIF",
+  "congratulations": "Congratulations!",
+  "continueToDetails": "Continue to Details",
+  "makeNew": "Make New",
+  "heresYourMasterpiece": "Here's Your Masterpiece"
 }

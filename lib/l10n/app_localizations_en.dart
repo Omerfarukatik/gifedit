@@ -376,4 +376,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings => 'SETTINGS';
+
+  @override
+  String get gifCreatedSuccessfully => 'GIF created successfully!';
+
+  @override
+  String get creating => 'Creating...';
+
+  @override
+  String get templateNotFound => 'Template not found.';
+
+  @override
+  String get useThisGif => 'Use This GIF';
+
+  @override
+  String get congratulations => 'Congratulations!';
+
+  @override
+  String get continueToDetails => 'Continue to Details';
+
+  @override
+  String get makeNew => 'Make New';
+
+  @override
+  String get heresYourMasterpiece => 'Here\'s Your Masterpiece';
 }

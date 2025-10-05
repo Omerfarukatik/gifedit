@@ -3,16 +3,22 @@
 class AppConstants {
   // Uygulama içinde kullanılacak varsayılan GIF URL'lerinin listesi.
   static const List<String> defaultGifUrls = [
-    "https://media1.tenor.com/m/lPkdIZawQpEAAAAC/pedro-pascal-slay.gif",
-    "https://media1.tenor.com/m/idRqMvuHAKEAAAAd/well-done.gif",
-    "https://media1.tenor.com/m/YG8C8C5gkQUAAAAC/happy-tears.gif",
-    "https://media1.tenor.com/m/A9NbzhhyVFEAAAAd/rolling-eyes.gif",
-    "https://media1.tenor.com/m/_s2utYfxsogAAAAC/kylian-mbappe-parijs.gif",
-    "https://media1.tenor.com/m/bJ1zMWkMeUEAAAAd/thank-you-thank-you-sir.gif",
-    "https://media1.tenor.com/m/Og-LisnOkQYAAAAC/hum.gif",
-    "https://media1.tenor.com/m/nJ3EeUPhVKkAAAAC/barny-stinson.gif",
-    "https://media1.tenor.com/m/qJ_3jhWbSywAAAAd/monica-friends.gif",
-    "https://media1.tenor.com/m/ruE3vvWiQGEAAAAC/zoktay-zeynep-oktay.gif",
+
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668358/tenor14_l6emxl.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668356/tenor13_ms4vwa.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668353/tenor12_wo0vyb.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668350/tenor11_f2hu2z.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668349/tenor10_c4l6pi.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668346/tenor9_dan97b.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668344/tenor8_lf3hx4.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668342/tenor7_sqefbg.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668340/tenor6_dchecb.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668338/tenor5_f4rsnj.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668338/tenor3_qjxkws.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759672224/jonah-hill-excited_xdcaqy.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668334/tenor2_zphwgf.gif",
+    "https://res.cloudinary.com/dafoavskw/image/upload/v1759668334/tenor_u6s8h6.gif",
+
     // Buraya kendi linklerini ekleyebilirsin
   ];
 }
