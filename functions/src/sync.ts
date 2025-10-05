@@ -27,11 +27,11 @@ export const updateUserPostsOnProfileUpdate = onDocumentUpdated(
 
     // 3. KONTROL: Gerçekten ilgili bir değişiklik var mı?
     const usernameChanged = newData.username !== previousData.username;
-    // DİKKAT: Senin `index.ts` kodunda 'avatar_url' kullanılıyor.
-    const avatarChanged = newData.avatar_url !== previousData.avatar_url;
+    // DİKKAT: Senin `index.ts` kodunda 'avatarUrl' kullanılıyor.
+    const avatarChanged = newData.avatarUrl !== previousData.avatarUrl;
 
     if (!usernameChanged && !avatarChanged) {
-      logger.info(`Kullanıcı ${userId} için ilgili alanlar (username, avatar_url) değişmedi.`);
+      logger.info(`Kullanıcı ${userId} için ilgili alanlar (username, avatarUrl) değişmedi.`);
       return;
     }
 
@@ -53,7 +53,7 @@ export const updateUserPostsOnProfileUpdate = onDocumentUpdated(
     }
     if (avatarChanged) {
       // DİKKAT: GIF dökümanlarındaki alan adı 'creatorProfileUrl'
-      updateData.creatorProfileUrl = newData.avatar_url;
+      updateData.creatorProfileUrl = newData.avatarUrl;
     }
 
     // -- HATA DÜZELTİLDİ: try...catch bloğu doğru yapıya kavuşturuldu --
